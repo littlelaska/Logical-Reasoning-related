@@ -11982,5 +11982,501 @@
     ],
     "answer": "F",
     "reasoning_cot": "Let’s reason through the clues step by step.  \n\nWe have 7 vehicles:  \n1 = oldest, 7 = newest.  \n\nGiven facts:  \n\n1. Limousine is the newest → Limo = 7.  \n2. Bus is third-newest → Bus = 5 (since newest is 7, second-newest is 6, third-newest is 5).  \n3. Bus is older than the convertible → Convertible’s position > 5 → Convertible = 6 or 7. But 7 is Limo, so Convertible = 6.  \n4. Sedan is third-oldest → third-oldest means position 3 (oldest=1, second-oldest=2, third-oldest=3). Sedan = 3.  \n5. Station wagon is older than the truck → SW position < Truck position.  \n6. Hatchback is the oldest → Hatchback = 1.  \n\nPositions so far:  \n1: Hatchback  \n3: Sedan  \n5: Bus  \n6: Convertible  \n7: Limousine  \n\nRemaining positions: 2, 4.  \nRemaining vehicles: Station wagon, Truck.  \n\nConstraint: SW older than Truck → SW must be 2, Truck must be 4.  \n\nFinal order:  \n1: Hatchback  \n2: Station wagon  \n3: Sedan  \n4: Truck  \n5: Bus  \n6: Convertible  \n7: Limousine  \n\nQuestion: Which is true about third-newest?  \nThird-newest = position 5 = Bus.  \n\nFrom options: \"The bus is the third-newest\" matches F.  \n\nThe correct option is: F"
+  },
+  {
+    "id": "logical_deduction_799",
+    "context": "The following paragraphs each describe a set of seven objects arranged in a fixed order. The statements are logically consistent within each paragraph.\n\nIn a golf tournament, there were seven golfers: Joe, Mel, Mya, Eve, Rob, Ada, and Dan. Rob finished first. Eve finished last. Dan finished above Ada. Mel finished above Mya. Joe finished second-to-last. Mya finished third.",
+    "question": "Which of the following is true?",
+    "options": [
+      "A) Joe finished first.",
+      "B) Mel finished first.",
+      "C) Mya finished first.",
+      "D) Eve finished first.",
+      "E) Rob finished first.",
+      "F) Ada finished first.",
+      "G) Dan finished first."
+    ],
+    "answer": "E",
+    "reasoning_cot": "Let’s go step by step.  \n\nGiven facts:  \n1. Rob finished first.  \n2. Eve finished last (7th).  \n3. Dan finished above Ada.  \n4. Mel finished above Mya.  \n5. Joe finished second-to-last (6th).  \n6. Mya finished third.  \n\nStep 1 – Place known positions.  \n• 1st: Rob (from fact 1)  \n\n• 7th: Eve  \n\n• 6th: Joe  \n\n• 3rd: Mya  \n\nRemaining positions: 2nd, 4th, 5th.  \nRemaining golfers: Mel, Ada, Dan.  \n\nStep 2 – Use “Mel finished above Mya.”  \nMya is 3rd, so Mel must be 1st or 2nd. But 1st is Rob, so Mel must be 2nd.  \n\nSo:  \n2nd: Mel  \n\nStep 3 – Remaining positions and golfers.  \nPositions left: 4th, 5th.  \nGolfers left: Ada, Dan.  \n\nStep 4 – Use “Dan finished above Ada.”  \nSo Dan must be 4th, Ada must be 5th.  \n\nFinal order:  \n1: Rob  \n2: Mel  \n3: Mya  \n4: Dan  \n5: Ada  \n6: Joe  \n7: Eve  \n\nStep 5 – Check the options.  \nThe question asks: “Which of the following is true?”  \nOptions A–G each say “[Name] finished first.”  \nOnly E says “Rob finished first,” which matches our order.  \n\nThe correct option is: E"
+  },
+  {
+    "id": "logical_deduction_800",
+    "context": "The following paragraphs each describe a set of seven objects arranged in a fixed order. The statements are logically consistent within each paragraph.\n\nOn a branch, there are seven birds: a hawk, a crow, an owl, a raven, a falcon, a quail, and a hummingbird. The hummingbird is the second from the left. The raven is the fourth from the left. The raven is to the right of the hawk. The owl is to the right of the crow. The falcon is the rightmost. The hawk is to the right of the hummingbird. The quail is the second from the right.",
+    "question": "Which of the following is true?",
+    "options": [
+      "A) The hawk is the rightmost.",
+      "B) The crow is the rightmost.",
+      "C) The owl is the rightmost.",
+      "D) The raven is the rightmost.",
+      "E) The falcon is the rightmost.",
+      "F) The quail is the rightmost.",
+      "G) The hummingbird is the rightmost."
+    ],
+    "answer": "E",
+    "reasoning_cot": "Let’s go step by step.  \n\nWe have 7 positions: 1 (leftmost) to 7 (rightmost).  \n\n1. Given facts:  \n• Hummingbird (Hm) is 2nd from left → Position 2.  \n\n• Raven (Rv) is 4th from left → Position 4.  \n\n• Raven is to the right of Hawk (Hk) → Hk is left of Rv (so Hk is in position 1, 2, or 3, but position 2 is Hm, so Hk is in 1 or 3).  \n\n• Falcon (F) is rightmost → Position 7.  \n\n• Hawk is to the right of Hummingbird → Hm is in 2, so Hk must be in a position >2. So Hk is in position 3 (since 1 is not >2, and 4 is Rv).  \n\nThus: Hk = position 3.  \n\nSo far:  \nPos 1: ?  \nPos 2: Hm  \nPos 3: Hk  \nPos 4: Rv  \nPos 7: F  \n\n2. Remaining birds: Crow (C), Owl (O), Quail (Q).  \n• Quail is 2nd from right → Position 6.  \n\nSo: Pos 6: Q.  \n\n3. Remaining positions: 1, 5. For C and O.  \n• Owl is to the right of Crow → O > C.  \n\nSo C must be in 1, O in 5.  \n\nFinal order:  \n1: C  \n2: Hm  \n3: Hk  \n4: Rv  \n5: O  \n6: Q  \n7: F  \n\nRightmost is Falcon.  \n\nThe correct option is: E"
+  },
+  {
+    "id": "logical_deduction_801",
+    "context": "The following paragraphs each describe a set of seven objects arranged in a fixed order. The statements are logically consistent within each paragraph.\n\nIn an antique car show, there are seven vehicles: a truck, a convertible, a bus, a station wagon, a minivan, a sedan, and a motorcyle. The bus is newer than the sedan. The motorcyle is older than the truck. The station wagon is older than the motorcyle. The sedan is newer than the convertible. The station wagon is newer than the bus. The minivan is the fourth-newest.",
+    "question": "Which of the following is true?",
+    "options": [
+      "A) The truck is the newest.",
+      "B) The convertible is the newest.",
+      "C) The bus is the newest.",
+      "D) The station wagon is the newest.",
+      "E) The minivan is the newest.",
+      "F) The sedan is the newest.",
+      "G) The motorcyle is the newest."
+    ],
+    "answer": "A",
+    "reasoning_cot": "Let’s break this down step by step.  \n\nWe have 7 vehicles:  \nTruck (T), Convertible (C), Bus (B), Station wagon (W), Minivan (M), Sedan (S), Motorcycle (R).  \n\nStatements:  \n\n1. Bus is newer than Sedan → B > S (meaning B is newer than S; newer = higher in order if we list from oldest to newest).  \n2. Motorcycle is older than Truck → R < T.  \n3. Station wagon is older than Motorcycle → W < R.  \n4. Sedan is newer than Convertible → S > C.  \n5. Station wagon is newer than Bus → W > B.  \n6. Minivan is 4th-newest → M is 4th from oldest (i.e., 4th oldest = 4th from bottom in age order).  \n\nStep 1 – Combine inequalities  \n\nFrom (5) W > B, and (1) B > S, and (4) S > C:  \nW > B > S > C.  \n\nFrom (3) W < R and (2) R < T:  \nActually check: (3) says W older than R → W < R.  \n(2) says R older than T → R < T.  \nSo: W < R < T.  \n\nWait — contradiction? W > B from (5) and W < R from (3) means B < R.  \nBut we also have B > S from (1). So B < R and B > S means R > B > S.  \n\nBut W < R and W > B is fine: B < W < R.  \n\nLet’s check carefully:  \n\n(5) W newer than B → W > B.  \n(3) W older than R → W < R.  \nSo B < W < R.  \n\n(2) R older than T → R < T.  \nSo B < W < R < T.  \n\nAlso (1) B newer than S → B > S.  \nSo S < B < W < R < T.  \n\nAlso (4) S newer than C → S > C.  \nSo C < S < B < W < R < T.  \n\nStep 2 – Order so far (oldest to newest = left to right):  \n\nC, S, B, W, R, T.  \n\nThat’s 6 vehicles. M is 4th-newest (4th from oldest = position 4 in oldest-to-newest list of 7).  \n\nPositions: oldest = 1, newest = 7. 4th-newest = position 4.  \n\nStep 3 – Insert M at position 4  \n\nCurrent order without M:  \n1: C  \n2: S  \n3: B  \n4: ?  \n5: W  \n6: R  \n7: T  \n\nBut W is 5th, R 6th, T 7th.  \n\nCheck: C, S, B, (M here), W, R, T.  \n\nThat fits: M is 4th oldest.  \n\nStep 4 – Newest vehicle  \n\nNewest is T (Truck).  \n\nStep 5 – Match to options  \n\nOption A: The truck is the newest → True.  \n\nThe correct option is: A"
+  },
+  {
+    "id": "logical_deduction_802",
+    "context": "The following paragraphs each describe a set of seven objects arranged in a fixed order. The statements are logically consistent within each paragraph.\n\nA fruit stand sells seven fruits: oranges, watermelons, peaches, pears, kiwis, cantaloupes, and plums. The kiwis are the second-cheapest. The plums are the cheapest. The cantaloupes are less expensive than the watermelons. The oranges are the most expensive. The pears are the third-cheapest. The peaches are the third-most expensive.",
+    "question": "Which of the following is true?",
+    "options": [
+      "A) The oranges are the second-cheapest.",
+      "B) The watermelons are the second-cheapest.",
+      "C) The peaches are the second-cheapest.",
+      "D) The pears are the second-cheapest.",
+      "E) The kiwis are the second-cheapest.",
+      "F) The cantaloupes are the second-cheapest.",
+      "G) The plums are the second-cheapest."
+    ],
+    "answer": "E",
+    "reasoning_cot": "Let’s go step by step.  \n\nWe have 7 fruits, ordered from cheapest (1st) to most expensive (7th).  \n\nGiven facts:  \n\n1. Kiwis are the second-cheapest → Kiwis = position 2.  \n2. Plums are the cheapest → Plums = position 1.  \n3. Cantaloupes are less expensive than watermelons → Cantaloupe position < Watermelon position.  \n4. Oranges are the most expensive → Oranges = position 7.  \n5. Pears are the third-cheapest → Pears = position 3.  \n6. Peaches are the third-most expensive → Peaches = position 5 (since 3rd from the top in price means 5th cheapest).  \n\nPositions filled so far:  \n1: Plums  \n2: Kiwis  \n3: Pears  \n5: Peaches  \n7: Oranges  \n\nRemaining positions: 4 and 6.  \nRemaining fruits: Cantaloupes, Watermelons.  \n\nCantaloupes < Watermelons in price → Cantaloupes must be in position 4, Watermelons in position 6.  \n\nFinal order (cheapest to most expensive):  \n1. Plums  \n2. Kiwis  \n3. Pears  \n4. Cantaloupes  \n5. Peaches  \n6. Watermelons  \n7. Oranges  \n\nThe second-cheapest is Kiwis.  \n\nThe correct option is: E"
+  },
+  {
+    "id": "logical_deduction_803",
+    "context": "The following paragraphs each describe a set of seven objects arranged in a fixed order. The statements are logically consistent within each paragraph.\n\nOn a branch, there are seven birds: a falcon, an owl, a quail, a raven, a hummingbird, a blue jay, and a crow. The quail is to the left of the owl. The owl is the second from the left. The crow is to the right of the falcon. The blue jay is to the right of the hummingbird. The hummingbird is to the right of the raven. The blue jay is to the left of the falcon.",
+    "question": "Which of the following is true?",
+    "options": [
+      "A) The falcon is the third from the right.",
+      "B) The owl is the third from the right.",
+      "C) The quail is the third from the right.",
+      "D) The raven is the third from the right.",
+      "E) The hummingbird is the third from the right.",
+      "F) The blue jay is the third from the right.",
+      "G) The crow is the third from the right."
+    ],
+    "answer": "F",
+    "reasoning_cot": "Let’s reason step by step.  \n\nWe have 7 positions: 1 (leftmost) to 7 (rightmost).  \n\n1. \"The owl is the second from the left\" → Owl is in position 2.  \n2. \"The quail is to the left of the owl\" → Quail must be in position 1 (since only position 1 is left of position 2).  \n   So: 1: Quail, 2: Owl.  \n\n3. \"The blue jay is to the right of the hummingbird\" → BJ > HB in position number.  \n4. \"The hummingbird is to the right of the raven\" → HB > Raven.  \n   So: Raven < HB < BJ in position order.  \n\n5. \"The blue jay is to the left of the falcon\" → BJ < Falcon.  \n6. \"The crow is to the right of the falcon\" → Crow > Falcon.  \n\nSo we have: Raven < HB < BJ < Falcon < Crow.  \n\nNow assign positions 3–7 to Raven, HB, BJ, Falcon, Crow in that order.  \n\nPositions: 1: Quail, 2: Owl, then 3,4,5,6,7 for Raven, HB, BJ, Falcon, Crow in that order.  \n\nSo:  \n3: Raven  \n4: Hummingbird  \n5: Blue Jay  \n6: Falcon  \n7: Crow  \n\nCheck:  \n• Quail left of Owl ✔ (1 < 2)  \n\n• Owl second from left ✔ (pos 2)  \n\n• Crow right of Falcon ✔ (7 > 6)  \n\n• BJ right of HB ✔ (5 > 4)  \n\n• HB right of Raven ✔ (4 > 3)  \n\n• BJ left of Falcon ✔ (5 < 6)  \n\nNow \"third from the right\" means position 5 (since rightmost is 7, second from right is 6, third from right is 5).  \n\nPosition 5: Blue Jay.  \n\nThe correct option is: F"
+  },
+  {
+    "id": "logical_deduction_804",
+    "context": "The following paragraphs each describe a set of seven objects arranged in a fixed order. The statements are logically consistent within each paragraph.\n\nIn a golf tournament, there were seven golfers: Ana, Eli, Mya, Amy, Joe, Mel, and Ada. Ada finished above Mel. Ada finished third-to-last. Amy finished above Ana. Mya finished second-to-last. Joe finished above Amy. Eli finished below Ana.",
+    "question": "Which of the following is true?",
+    "options": [
+      "A) Ana finished second-to-last.",
+      "B) Eli finished second-to-last.",
+      "C) Mya finished second-to-last.",
+      "D) Amy finished second-to-last.",
+      "E) Joe finished second-to-last.",
+      "F) Mel finished second-to-last.",
+      "G) Ada finished second-to-last."
+    ],
+    "answer": "C",
+    "reasoning_cot": "Let’s go step by step.  \n\nWe have 7 golfers: Ana, Eli, Mya, Amy, Joe, Mel, Ada.  \nPositions: 1st (highest) to 7th (lowest).  \n\nGiven facts:  \n1. Ada finished above Mel. (Ada < Mel in position number, meaning Ada’s position number is smaller than Mel’s)  \n2. Ada finished third-to-last.  \n   • Third-to-last means: 7th is last, 6th is second-to-last, 5th is third-to-last.  \n\n   • So Ada is 5th.  \n\n3. Amy finished above Ana. (Amy < Ana in position number)  \n4. Mya finished second-to-last.  \n   • Second-to-last is 6th. So Mya is 6th.  \n\n5. Joe finished above Amy. (Joe < Amy in position number)  \n6. Eli finished below Ana. (Eli > Ana in position number)  \n\nFrom 2 and 4:  \nPositions known:  \n5th: Ada  \n6th: Mya  \n7th: ?  \n\nFrom 1: Ada (5th) above Mel → Mel must be after 5th.  \nPossible positions for Mel: 6th or 7th.  \nBut 6th is Mya, so Mel must be 7th.  \n\nSo:  \n5th: Ada  \n6th: Mya  \n7th: Mel  \n\nRemaining positions: 1, 2, 3, 4 for Ana, Amy, Joe, Eli.  \n\nConstraints:  \n• Amy > Ana (Amy above Ana → Amy’s position number smaller than Ana’s)  \n\n• Joe > Amy (Joe above Amy → Joe’s position number smaller than Amy’s)  \n\n• Eli < Ana (Eli below Ana → Eli’s position number larger than Ana’s)  \n\nOrdering:  \nFrom Joe > Amy > Ana > Eli.  \nSo in positions: Joe best, then Amy, then Ana, then Eli worst among these four.  \n\nBut these four occupy positions 1–4.  \nSo: Joe (1st), Amy (2nd), Ana (3rd), Eli (4th) fits all constraints.  \n\nCheck:  \nJoe(1) > Amy(2) > Ana(3) > Eli(4) — yes.  \nEli(4) below Ana(3) — yes.  \n\nFinal order:  \n1: Joe  \n2: Amy  \n3: Ana  \n4: Eli  \n5: Ada  \n6: Mya  \n7: Mel  \n\nQuestion: Which is true about second-to-last?  \nSecond-to-last is 6th → Mya.  \n\nOptions:  \nA) Ana 6th? No.  \nB) Eli 6th? No.  \nC) Mya 6th? Yes.  \nD) Amy 6th? No.  \nE) Joe 6th? No.  \nF) Mel 6th? No.  \nG) Ada 6th? No.  \n\nThe correct option is: C"
+  },
+  {
+    "id": "logical_deduction_805",
+    "context": "The following paragraphs each describe a set of seven objects arranged in a fixed order. The statements are logically consistent within each paragraph.\n\nA fruit stand sells seven fruits: kiwis, plums, mangoes, watermelons, pears, peaches, and oranges. The pears are the third-cheapest. The kiwis are the second-most expensive. The pears are more expensive than the plums. The oranges are less expensive than the kiwis. The mangoes are the third-most expensive. The peaches are the second-cheapest.",
+    "question": "Which of the following is true?",
+    "options": [
+      "A) The kiwis are the second-most expensive.",
+      "B) The plums are the second-most expensive.",
+      "C) The mangoes are the second-most expensive.",
+      "D) The watermelons are the second-most expensive.",
+      "E) The pears are the second-most expensive.",
+      "F) The peaches are the second-most expensive.",
+      "G) The oranges are the second-most expensive."
+    ],
+    "answer": "A",
+    "reasoning_cot": "Let’s reason through the constraints step-by-step.  \n\nWe have 7 fruits in order of price from cheapest (1st) to most expensive (7th).  \n\nGiven facts:  \n1. Pears are 3rd-cheapest → position 3 in ascending price order.  \n2. Kiwis are 2nd-most expensive → position 6.  \n3. Pears are more expensive than plums → plums cheaper than pears → plums in position 1 or 2.  \n4. Oranges less expensive than kiwis → oranges not in position 6 or 7.  \n5. Mangoes are 3rd-most expensive → position 5.  \n6. Peaches are 2nd-cheapest → position 2.  \n\nFrom (6), peaches = pos 2.  \nFrom (3), plums cheaper than pears (pos 3) → plums could be pos 1 or 2, but pos 2 is peaches → so plums = pos 1.  \n\nSo far:  \n1: Plums  \n2: Peaches  \n3: Pears  \n5: Mangoes  \n6: Kiwis  \n\nRemaining positions: 4 and 7, and fruits left: watermelons, oranges.  \n\nFrom (4), oranges less expensive than kiwis (pos 6) → oranges must be in a position < 6. Possible: pos 4 or pos 5, but pos 5 is mangoes → so oranges = pos 4.  \n\nThen pos 7 = watermelons.  \n\nFinal order (cheapest to most expensive):  \n1: Plums  \n2: Peaches  \n3: Pears  \n4: Oranges  \n5: Mangoes  \n6: Kiwis  \n7: Watermelons  \n\nCheck:  \n• Pears 3rd-cheapest ✔  \n\n• Kiwis 2nd-most expensive (pos 6) ✔  \n\n• Pears > plums ✔  \n\n• Oranges < kiwis ✔  \n\n• Mangoes 3rd-most expensive (pos 5) ✔  \n\n• Peaches 2nd-cheapest ✔  \n\nQuestion: Which is true about second-most expensive?  \nSecond-most expensive = position 6 = Kiwis.  \n\nOption A says “The kiwis are the second-most expensive.” That’s exactly true.  \n\nThe correct option is: A"
+  },
+  {
+    "id": "logical_deduction_806",
+    "context": "The following paragraphs each describe a set of seven objects arranged in a fixed order. The statements are logically consistent within each paragraph.\n\nOn a shelf, there are seven books: a green book, a brown book, a white book, a black book, an orange book, a purple book, and a yellow book. The purple book is to the left of the yellow book. The green book is to the left of the white book. The brown book is to the right of the yellow book. The white book is the fourth from the left. The green book is to the right of the orange book. The black book is the second from the left.",
+    "question": "Which of the following is true?",
+    "options": [
+      "A) The green book is the second from the left.",
+      "B) The brown book is the second from the left.",
+      "C) The white book is the second from the left.",
+      "D) The black book is the second from the left.",
+      "E) The orange book is the second from the left.",
+      "F) The purple book is the second from the left.",
+      "G) The yellow book is the second from the left."
+    ],
+    "answer": "D",
+    "reasoning_cot": "Let’s reason step by step.  \n\nStep 1 – Fixed positions given directly  \n• White book is 4th from the left:  \n\nPositions: 1 2 3 4 5 6 7  \nWhite = position 4.  \n\n• Black book is 2nd from the left:  \n\nBlack = position 2.  \n\nSo far:  \n1: ?  \n2: Black  \n3: ?  \n4: White  \n5: ?  \n6: ?  \n7: ?  \n\nStep 2 – Ordering constraints  \n\n1. Purple is to the left of Yellow: P < Y.  \n2. Green is to the left of White: G < W (so G is in position 1, 2, or 3).  \n3. Brown is to the right of Yellow: Y < Brown.  \n4. Green is to the right of Orange: O < G.  \n\nFrom O < G < W(4):  \nO is before G, G is before position 4, so G is in {1,2,3} but not 2 (Black is 2), so G is in {1,3}.  \n\nStep 3 – Try G = 1  \nIf G = 1, then O < G means O must be to the left of 1 — impossible. So G cannot be 1.  \nThus G = 3.  \n\nThen O < G means O is in {1,2} but 2 is Black, so O = 1.  \n\nSo:  \n1: Orange  \n2: Black  \n3: Green  \n4: White  \n\nStep 4 – Place P, Y, Brown  \n\nWe have P < Y < Brown.  \nRemaining positions: {5, 6, 7}.  \n\nAlso, P, Y, Brown occupy 3 of the remaining 4 positions {5,6,7,?} — wait, we have 7 total:  \nFilled: 1(O), 2(Bk), 3(G), 4(W)  \nLeft: 5, 6, 7, and one more? That’s wrong — 4 filled, 3 left: {5,6,7} exactly.  \n\nSo P, Y, Brown must occupy {5,6,7} in that order:  \nP = 5, Y = 6, Brown = 7.  \n\nStep 5 – Check consistency  \nAll constraints:  \nP(5) < Y(6) ✓  \nG(3) < W(4) ✓  \nY(6) < Brown(7) ✓  \nO(1) < G(3) ✓  \nBlack(2) is 2nd from left ✓  \nWhite(4) is 4th from left ✓  \n\nEverything fits.  \n\nStep 6 – Answer the question  \nWhich is true?  \nA) Green is 2nd from left? No, Green is 3rd.  \nB) Brown is 2nd from left? No, Brown is 7th.  \nC) White is 2nd from left? No, White is 4th.  \nD) Black is 2nd from left? Yes, that’s given.  \nE) Orange is 2nd from left? No, Orange is 1st.  \nF) Purple is 2nd from left? No, Purple is 5th.  \nG) Yellow is 2nd from left? No, Yellow is 6th.  \n\nCorrect: D.  \n\nThe correct option is: D"
+  },
+  {
+    "id": "logical_deduction_807",
+    "context": "The following paragraphs each describe a set of seven objects arranged in a fixed order. The statements are logically consistent within each paragraph.\n\nOn a shelf, there are seven books: a yellow book, a brown book, a white book, an orange book, a black book, a blue book, and a purple book. The black book is the second from the left. The white book is to the right of the orange book. The black book is to the right of the brown book. The yellow book is the third from the right. The purple book is the third from the left. The orange book is the second from the right.",
+    "question": "Which of the following is true?",
+    "options": [
+      "A) The yellow book is the rightmost.",
+      "B) The brown book is the rightmost.",
+      "C) The white book is the rightmost.",
+      "D) The orange book is the rightmost.",
+      "E) The black book is the rightmost.",
+      "F) The blue book is the rightmost.",
+      "G) The purple book is the rightmost."
+    ],
+    "answer": "C",
+    "reasoning_cot": "Let’s number positions 1 (leftmost) to 7 (rightmost).\n\n1. \"The black book is the second from the left\" → Black = position 2.  \n2. \"The purple book is the third from the left\" → Purple = position 3.  \n3. \"The yellow book is the third from the right\" → Yellow = position 5 (since positions from left: 5 = 3rd from right: 5,6,7).  \n4. \"The orange book is the second from the right\" → Orange = position 6.  \n5. \"The white book is to the right of the orange book\" → White must be to the right of Orange (position 6), so White = position 7.  \n6. \"The black book is to the right of the brown book\" → Black (pos 2) is to the right of Brown, so Brown is to the left of Black → Brown = position 1.  \n\nRemaining position: position 4 is for Blue (only color left).  \n\nOrder:  \n1: Brown  \n2: Black  \n3: Purple  \n4: Blue  \n5: Yellow  \n6: Orange  \n7: White  \n\nRightmost = position 7 = White.  \n\nThe correct option is: C"
+  },
+  {
+    "id": "logical_deduction_808",
+    "context": "The following paragraphs each describe a set of seven objects arranged in a fixed order. The statements are logically consistent within each paragraph.\n\nOn a branch, there are seven birds: an owl, a crow, a falcon, a cardinal, a hummingbird, a quail, and a hawk. The falcon is to the left of the crow. The quail is to the right of the cardinal. The hummingbird is to the right of the quail. The falcon is the second from the right. The hummingbird is to the left of the hawk. The owl is the third from the left.",
+    "question": "Which of the following is true?",
+    "options": [
+      "A) The owl is the third from the right.",
+      "B) The crow is the third from the right.",
+      "C) The falcon is the third from the right.",
+      "D) The cardinal is the third from the right.",
+      "E) The hummingbird is the third from the right.",
+      "F) The quail is the third from the right.",
+      "G) The hawk is the third from the right."
+    ],
+    "answer": "G",
+    "reasoning_cot": "Let’s go step by step.  \n\nWe have 7 positions: 1 (leftmost) to 7 (rightmost).  \n\n1. \"The falcon is the second from the right\" → falcon is in position 6.  \n2. \"The falcon is to the left of the crow\" → crow is to the right of falcon → crow is in position 7.  \n3. \"The owl is the third from the left\" → owl is in position 3.  \n\n4. \"The hummingbird is to the left of the hawk\" → H < Hawk.  \n5. \"The quail is to the right of the cardinal\" → C < Q.  \n6. \"The hummingbird is to the right of the quail\" → Q < H.  \n\nFrom 5 and 6: C < Q < H.  \n\nSo order: cardinal, quail, hummingbird, then hawk.  \n\nWe know positions 6 (falcon) and 7 (crow) are taken.  \nPositions 3 (owl) is taken.  \n\nRemaining positions: 1, 2, 4, 5.  \n\nC < Q < H < Hawk must all be in some positions not 6 or 7 (since 6=falcon, 7=crow).  \n\nBut H < Hawk, and H is not 6 or 7, so H and Hawk could be in 4 and 5? Let’s check:  \n\nIf H is in 4, Hawk in 5, then Q in 2 or 3? But 3 is owl, so Q in 2, C in 1.  \n\nCheck: C(1) < Q(2) < H(4) < Hawk(5) works.  \n\nThen positions:  \n1: cardinal  \n2: quail  \n3: owl  \n4: hummingbird  \n5: hawk  \n6: falcon  \n7: crow  \n\nCheck all conditions:  \n• Falcon (6) left of crow (7) ✔  \n\n• Quail (2) right of cardinal (1) ✔  \n\n• Hummingbird (4) right of quail (2) ✔  \n\n• Falcon second from right (6) ✔  \n\n• Hummingbird (4) left of hawk (5) ✔  \n\n• Owl third from left (3) ✔  \n\nNow: \"third from the right\" means position 5 (since 7,6,5 count from right: 7=1st from right, 6=2nd from right, 5=3rd from right).  \n\nPosition 5 is hawk.  \n\nSo \"The hawk is the third from the right\" is true.  \n\nThe correct option is: G"
+  },
+  {
+    "id": "logical_deduction_809",
+    "context": "The following paragraphs each describe a set of seven objects arranged in a fixed order. The statements are logically consistent within each paragraph.\n\nIn an antique car show, there are seven vehicles: a sedan, a truck, a bus, a station wagon, a tractor, a convertible, and a limousine. The truck is the oldest. The tractor is the newest. The sedan is older than the station wagon. The station wagon is the third-newest. The bus is older than the convertible. The sedan is newer than the convertible.",
+    "question": "Which of the following is true?",
+    "options": [
+      "A) The sedan is the second-oldest.",
+      "B) The truck is the second-oldest.",
+      "C) The bus is the second-oldest.",
+      "D) The station wagon is the second-oldest.",
+      "E) The tractor is the second-oldest.",
+      "F) The convertible is the second-oldest.",
+      "G) The limousine is the second-oldest."
+    ],
+    "answer": "C",
+    "reasoning_cot": "Let’s reason through this step by step.  \n\nStep 1: Interpret the ordering  \nWe have 7 vehicles, ordered from oldest (1st) to newest (7th).  \n• Truck is oldest → Truck is 1st.  \n\n• Tractor is newest → Tractor is 7th.  \n\n• Station wagon is third-newest → 3rd from the newest means:  \n\n  Newest = 7th, 2nd newest = 6th, 3rd newest = 5th.  \n  So station wagon is 5th.  \n\nStep 2: Relative age constraints  \n• Sedan is older than station wagon → Sedan’s position < 5.  \n\n• Sedan is newer than convertible → Convertible’s position < Sedan’s position.  \n\n• Bus is older than convertible → Bus’s position < Convertible’s position.  \n\nSo: Bus < Convertible < Sedan < 5.  \n\nStep 3: Fill in known positions  \nPositions: 1 = Truck, 5 = Station wagon, 7 = Tractor.  \n\nRemaining positions: 2, 3, 4, 6.  \nVehicles left: Sedan, Bus, Convertible, Limousine.  \n\nFrom Bus < Convertible < Sedan < 5,  \nSedan must be in position 4 (since 4 < 5 and is the only spot for Sedan that fits).  \nThen Convertible must be in position 3 (since Convertible < Sedan = 4).  \nThen Bus must be in position 2 (since Bus < Convertible = 3).  \n\nStep 4: Assign last vehicle  \nPositions:  \n1 = Truck  \n2 = Bus  \n3 = Convertible  \n4 = Sedan  \n5 = Station wagon  \n6 = Limousine (only one left)  \n7 = Tractor  \n\nCheck all constraints:  \n• Truck oldest ✅  \n\n• Tractor newest ✅  \n\n• Sedan older than station wagon (4 < 5) ✅  \n\n• Station wagon 3rd newest (5th) ✅  \n\n• Bus older than convertible (2 < 3) ✅  \n\n• Sedan newer than convertible (4 > 3) ✅  \n\nStep 5: Answer the question  \nSecond-oldest = position 2 = Bus.  \n\nThe correct option is: C"
+  },
+  {
+    "id": "logical_deduction_810",
+    "context": "The following paragraphs each describe a set of seven objects arranged in a fixed order. The statements are logically consistent within each paragraph.\n\nOn a shelf, there are seven books: an orange book, a green book, a red book, a gray book, a purple book, a blue book, and a brown book. The purple book is the fourth from the left. The brown book is the third from the left. The green book is to the left of the blue book. The red book is the leftmost. The gray book is the third from the right. The orange book is the rightmost.",
+    "question": "Which of the following is true?",
+    "options": [
+      "A) The orange book is the third from the left.",
+      "B) The green book is the third from the left.",
+      "C) The red book is the third from the left.",
+      "D) The gray book is the third from the left.",
+      "E) The purple book is the third from the left.",
+      "F) The blue book is the third from the left.",
+      "G) The brown book is the third from the left."
+    ],
+    "answer": "G",
+    "reasoning_cot": "Let’s go step by step.  \n\nWe have 7 positions: 1 (leftmost) to 7 (rightmost).  \n\nFacts:  \n1. Purple = 4th from left → position 4.  \n2. Brown = 3rd from left → position 3.  \n3. Green is to the left of Blue → Green’s position < Blue’s position.  \n4. Red = leftmost → position 1.  \n5. Gray = 3rd from right → position 5 (since positions 1–7, 3rd from right = position 5).  \n6. Orange = rightmost → position 7.  \n\nPositions so far:  \nPos 1: Red  \nPos 3: Brown  \nPos 4: Purple  \nPos 5: Gray  \nPos 7: Orange  \n\nRemaining positions: 2 and 6.  \nRemaining books: Green and Blue.  \n\nGreen must be to the left of Blue → Green = Pos 2, Blue = Pos 6.  \n\nFinal order (1 to 7):  \n1: Red  \n2: Green  \n3: Brown  \n4: Purple  \n5: Gray  \n6: Blue  \n7: Orange  \n\nThird from left = position 3 = Brown.  \n\nCheck options:  \n• A) Orange is 3rd from left? No (Orange is 7th).  \n\n• B) Green is 3rd from left? No (Green is 2nd).  \n\n• C) Red is 3rd from left? No (Red is 1st).  \n\n• D) Gray is 3rd from left? No (Gray is 5th).  \n\n• E) Purple is 3rd from left? No (Purple is 4th).  \n\n• F) Blue is 3rd from left? No (Blue is 6th).  \n\n• G) Brown is 3rd from left? Yes.  \n\nThe correct option is: G"
+  },
+  {
+    "id": "logical_deduction_811",
+    "context": "The following paragraphs each describe a set of seven objects arranged in a fixed order. The statements are logically consistent within each paragraph.\n\nOn a branch, there are seven birds: a hawk, a raven, a falcon, a crow, a hummingbird, a robin, and a cardinal. The hawk is the second from the right. The robin is to the left of the raven. The raven is to the left of the crow. The falcon is to the left of the cardinal. The hummingbird is the second from the left. The falcon is the third from the right.",
+    "question": "Which of the following is true?",
+    "options": [
+      "A) The hawk is the third from the right.",
+      "B) The raven is the third from the right.",
+      "C) The falcon is the third from the right.",
+      "D) The crow is the third from the right.",
+      "E) The hummingbird is the third from the right.",
+      "F) The robin is the third from the right.",
+      "G) The cardinal is the third from the right."
+    ],
+    "answer": "C",
+    "reasoning_cot": "Let’s go step by step.  \n\nWe have 7 positions: 1 (leftmost) to 7 (rightmost).  \n\n1. \"The hawk is the second from the right\" → Hawk is in position 6.  \n2. \"The hummingbird is the second from the left\" → Hummingbird is in position 2.  \n3. \"The falcon is the third from the right\" → Falcon is in position 5.  \n4. \"The falcon is to the left of the cardinal\" → Cardinal must be in position 6 or 7, but position 6 is Hawk, so Cardinal must be in position 7.  \n5. \"The robin is to the left of the raven\" and \"The raven is to the left of the crow\" → Robin < Raven < Crow in order.  \n\nPositions so far:  \nPos 1: ?  \nPos 2: Hummingbird  \nPos 3: ?  \nPos 4: ?  \nPos 5: Falcon  \nPos 6: Hawk  \nPos 7: Cardinal  \n\nRobin, Raven, Crow occupy 3 of the remaining positions {1, 3, 4} in that order.  \nSo: Robin = Pos 1, Raven = Pos 3, Crow = Pos 4.  \n\nFinal order:  \n1: Robin  \n2: Hummingbird  \n3: Raven  \n4: Crow  \n5: Falcon  \n6: Hawk  \n7: Cardinal  \n\n\"Third from the right\" means position 5. Position 5 is Falcon.  \n\nThe correct option is: C"
+  },
+  {
+    "id": "logical_deduction_812",
+    "context": "The following paragraphs each describe a set of seven objects arranged in a fixed order. The statements are logically consistent within each paragraph.\n\nA fruit stand sells seven fruits: loquats, cantaloupes, watermelons, apples, oranges, pears, and mangoes. The oranges are the second-cheapest. The apples are less expensive than the pears. The mangoes are more expensive than the cantaloupes. The mangoes are the third-cheapest. The watermelons are the second-most expensive. The loquats are the third-most expensive.",
+    "question": "Which of the following is true?",
+    "options": [
+      "A) The loquats are the most expensive.",
+      "B) The cantaloupes are the most expensive.",
+      "C) The watermelons are the most expensive.",
+      "D) The apples are the most expensive.",
+      "E) The oranges are the most expensive.",
+      "F) The pears are the most expensive.",
+      "G) The mangoes are the most expensive."
+    ],
+    "answer": "F",
+    "reasoning_cot": "Let’s go step by step.  \n\nWe have 7 fruits, ordered from cheapest (1st) to most expensive (7th).  \n\nFacts given:\n\n1. Oranges are the second-cheapest → Oranges = position 2 (cheapest is position 1).  \n2. Apples are less expensive than the pears → Apples < Pears in price rank (smaller rank number = cheaper).  \n3. Mangoes are more expensive than cantaloupes → Mangoes > Cantaloupes.  \n4. Mangoes are the third-cheapest → Mangoes = position 3.  \n5. Watermelons are the second-most expensive → Watermelons = position 6 (since 7th is most expensive).  \n6. Loquats are the third-most expensive → Loquats = position 5 (since 7th, 6th, then 5th).  \n\nAssign known positions:  \nPositions: 1 (cheapest), 2, 3, 4, 5, 6, 7 (most expensive)  \n\n• 2 = Oranges  \n\n• 3 = Mangoes  \n\n• 5 = Loquats  \n\n• 6 = Watermelons  \n\nRemaining positions: 1, 4, 7 (unassigned fruits: Cantaloupes, Apples, Pears).  \n\nFrom Mangoes (3) > Cantaloupes: Cantaloupes must be cheaper than Mangoes, so Cantaloupes in position 1 or 2. But position 2 is Oranges, so Cantaloupes = position 1.  \n\nNow:  \n1 = Cantaloupes  \n2 = Oranges  \n3 = Mangoes  \n5 = Loquats  \n6 = Watermelons  \nRemaining positions: 4, 7 for Apples and Pears.  \n\nApples < Pears in price rank:  \nSo Pears must be 7, Apples must be 4.  \n\nFinal order (cheapest to most expensive):  \n\n1: Cantaloupes  \n2: Oranges  \n3: Mangoes  \n4: Apples  \n5: Loquats  \n6: Watermelons  \n7: Pears  \n\nMost expensive = Pears.  \n\nThe correct option is: F"
+  },
+  {
+    "id": "logical_deduction_813",
+    "context": "The following paragraphs each describe a set of seven objects arranged in a fixed order. The statements are logically consistent within each paragraph.\n\nIn a golf tournament, there were seven golfers: Joe, Eve, Mel, Amy, Mya, Dan, and Rob. Amy finished above Dan. Rob finished third. Mel finished below Rob. Dan finished second-to-last. Eve finished above Amy. Mel finished above Dan. Joe finished fourth.",
+    "question": "Which of the following is true?",
+    "options": [
+      "A) Joe finished third.",
+      "B) Eve finished third.",
+      "C) Mel finished third.",
+      "D) Amy finished third.",
+      "E) Mya finished third.",
+      "F) Dan finished third.",
+      "G) Rob finished third."
+    ],
+    "answer": "G",
+    "reasoning_cot": "Let’s reason through the clues step-by-step.  \n\nStep 1 – Known fixed positions  \n• Rob finished 3rd. (Given directly.)  \n\n• Dan finished second-to-last. Since there are 7 golfers, second-to-last = 6th.  \n\n• Joe finished 4th. (Given directly.)  \n\nSo far:  \n1: ?  \n2: ?  \n3: Rob  \n4: Joe  \n5: ?  \n6: Dan  \n7: ?  \n\nStep 2 – Amy above Dan, Eve above Amy, Mel above Dan, Mel below Rob  \n• Amy above Dan → Amy is not 6th or 7th → Amy is in positions 1–5.  \n\n• Eve above Amy → Eve is above Amy in ranking (smaller number).  \n\n• Mel above Dan → Mel is not 6th or 7th → Mel is in positions 1–5.  \n\n• Mel below Rob → Mel’s position number > 3 → Mel is 4th or 5th.  \n\nBut 4th is Joe, so Mel must be 5th.  \n\nNow:  \n1: ?  \n2: ?  \n3: Rob  \n4: Joe  \n5: Mel  \n6: Dan  \n7: ?  \n\nStep 3 – Amy above Dan, but below Eve  \nAmy must be above Dan (6th) and below Eve.  \nPossible positions for Amy: 1, 2, or 5? But 5 is Mel, so Amy can be 1 or 2.  \nEve must be above Amy, so if Amy is 1, impossible (nobody above her). So Amy must be 2nd, Eve must be 1st.  \n\nSo:  \n1: Eve  \n2: Amy  \n3: Rob  \n4: Joe  \n5: Mel  \n6: Dan  \n7: Mya (only one left)  \n\nStep 4 – Check constraints  \n• Amy above Dan ✓ (2 vs 6)  \n\n• Rob 3rd ✓  \n\n• Mel below Rob ✓ (5 vs 3)  \n\n• Dan 6th ✓  \n\n• Eve above Amy ✓ (1 vs 2)  \n\n• Mel above Dan ✓ (5 vs 6)  \n\n• Joe 4th ✓  \n\nAll consistent.  \n\nStep 5 – Who finished 3rd?  \nRob finished 3rd.  \n\nThat matches option G.  \n\nThe correct option is: G"
+  },
+  {
+    "id": "logical_deduction_814",
+    "context": "The following paragraphs each describe a set of seven objects arranged in a fixed order. The statements are logically consistent within each paragraph.\n\nA fruit stand sells seven fruits: watermelons, cantaloupes, pears, peaches, mangoes, kiwis, and oranges. The oranges are more expensive than the cantaloupes. The pears are less expensive than the kiwis. The kiwis are the fourth-most expensive. The mangoes are less expensive than the pears. The peaches are the cheapest. The cantaloupes are more expensive than the watermelons.",
+    "question": "Which of the following is true?",
+    "options": [
+      "A) The watermelons are the second-most expensive.",
+      "B) The cantaloupes are the second-most expensive.",
+      "C) The pears are the second-most expensive.",
+      "D) The peaches are the second-most expensive.",
+      "E) The mangoes are the second-most expensive.",
+      "F) The kiwis are the second-most expensive.",
+      "G) The oranges are the second-most expensive."
+    ],
+    "answer": "B",
+    "reasoning_cot": "Let’s reason step by step.  \n\nWe have 7 fruits: W (watermelons), C (cantaloupes), P (pears), Pe (peaches), M (mangoes), K (kiwis), O (oranges).  \nCost ranking: most expensive = 1st, cheapest = 7th.  \n\nGiven facts:  \n1. O > C  (oranges more expensive than cantaloupes)  \n2. P < K  (pears less expensive than kiwis)  \n3. K = 4th most expensive  \n4. M < P  (mangoes less expensive than pears)  \n5. Pe = cheapest (7th)  \n6. C > W  (cantaloupes more expensive than watermelons)  \n\nStep 1 – From (2) and (3):  \nK is 4th. P < K means P is cheaper than K, so P’s rank is 5, 6, or 7.  \n\nStep 2 – From (4) M < P:  \nM is cheaper than P, so M’s rank is worse (higher number) than P’s rank.  \nIf P is 5th, M could be 6th or 7th. But Pe is 7th, so M can’t be 7th.  \nSo if P = 5th, M = 6th, Pe = 7th.  \nIf P = 6th, M = 7th, but Pe = 7th → impossible (two fruits can’t both be cheapest).  \nSo P cannot be 6th or 7th.  \nThus: P = 5th, M = 6th, Pe = 7th.  \n\nStep 3 – Remaining ranks:  \nRanks left: 1, 2, 3 (since 4th = K, 5th = P, 6th = M, 7th = Pe).  \nFruits not yet placed: W, C, O.  \n\nStep 4 – Using O > C and C > W:  \nO > C > W.  \nSo among ranks 1, 2, 3:  \nO is highest, then C, then W.  \nThus: O = 1st, C = 2nd, W = 3rd.  \n\nStep 5 – Check consistency:  \nOrder: 1: O, 2: C, 3: W, 4: K, 5: P, 6: M, 7: Pe.  \nAll conditions satisfied:  \nO > C ✓, P < K ✓, K = 4th ✓, M < P ✓, Pe = cheapest ✓, C > W ✓.  \n\nStep 6 – Answer the question:  \nSecond-most expensive = C (cantaloupes).  \n\nThe correct option is: B"
+  },
+  {
+    "id": "logical_deduction_815",
+    "context": "The following paragraphs each describe a set of seven objects arranged in a fixed order. The statements are logically consistent within each paragraph.\n\nIn an antique car show, there are seven vehicles: a station wagon, a limousine, a truck, a minivan, a motorcyle, a hatchback, and a bus. The motorcyle is older than the truck. The station wagon is older than the hatchback. The motorcyle is newer than the hatchback. The bus is the second-newest. The minivan is the oldest. The limousine is older than the station wagon.",
+    "question": "Which of the following is true?",
+    "options": [
+      "A) The station wagon is the second-newest.",
+      "B) The limousine is the second-newest.",
+      "C) The truck is the second-newest.",
+      "D) The minivan is the second-newest.",
+      "E) The motorcyle is the second-newest.",
+      "F) The hatchback is the second-newest.",
+      "G) The bus is the second-newest."
+    ],
+    "answer": "G",
+    "reasoning_cot": "Let’s reason step by step.  \n\nWe have 7 vehicles:  \n1. Station wagon (SW)  \n2. Limousine (L)  \n3. Truck (T)  \n4. Minivan (M)  \n5. Motorcycle (MC)  \n6. Hatchback (H)  \n7. Bus (B)  \n\nStatements:  \n\n1. MC is older than T → MC > T (in age, \"older\" means comes before in age ranking, so if we list oldest to newest: oldest on left, newest on right)  \n   MC > T means MC appears before T in age order (oldest to newest).  \n\n2. SW is older than H → SW > H  \n\n3. MC is newer than H → H > MC (older means H before MC) — wait, check: \"MC is newer than H\" means H is older than MC, so H > MC.  \n\n4. Bus is the second-newest → B is 6th oldest (2nd newest = 6th in oldest-to-newest list of 7).  \n\n5. Minivan is the oldest → M is 1st.  \n\n6. Limousine is older than SW → L > SW.  \n\nFrom (3) H > MC and (1) MC > T, we get:  \nH > MC > T.  \n\nFrom (6) L > SW and (2) SW > H, we get:  \nL > SW > H.  \n\nCombine: L > SW > H > MC > T.  \n\nSo far: oldest to newest: … L … SW … H … MC … T …  \n\nMinivan is oldest (1st), so M is before L.  \n\nSo: M, L, SW, H, MC, T, and Bus is 2nd newest (6th), so between MC, T, and Bus:  \n\nWe have 7 positions: 1=M, then L, SW, H, MC, then 6th = B, 7th = newest.  \n\nWe must place T and B: B is 6th. T must be after MC.  \n\nPossible arrangement:  \nPositions: 1=M, 2=L, 3=SW, 4=H, 5=MC, 6=B, 7=T.  \n\nCheck:  \n• MC > T? MC is 5th, T is 7th → MC older than T? Yes (5<7 in age rank means older).  \n\n• SW older than H? SW 3, H 4 → yes.  \n\n• MC newer than H? H 4, MC 5 → yes (H older).  \n\n• Bus 6th → yes.  \n\n• M oldest → yes.  \n\n• L older than SW → L 2, SW 3 → yes.  \n\nAll consistent.  \n\nSo second-newest (6th) is Bus.  \n\nThe correct option is: G"
+  },
+  {
+    "id": "logical_deduction_816",
+    "context": "The following paragraphs each describe a set of seven objects arranged in a fixed order. The statements are logically consistent within each paragraph.\n\nIn a golf tournament, there were seven golfers: Ana, Eli, Mya, Amy, Joe, Mel, and Ada. Ada finished above Mel. Ada finished third-to-last. Amy finished above Ana. Mya finished second-to-last. Joe finished above Amy. Eli finished below Ana.",
+    "question": "Which of the following is true?",
+    "options": [
+      "A) Ana finished fourth.",
+      "B) Eli finished fourth.",
+      "C) Mya finished fourth.",
+      "D) Amy finished fourth.",
+      "E) Joe finished fourth.",
+      "F) Mel finished fourth.",
+      "G) Ada finished fourth."
+    ],
+    "answer": "B",
+    "reasoning_cot": "Let’s go step by step.  \n\nStep 1: Interpret the fixed order  \nSeven golfers: positions 1 (highest finish, best rank) to 7 (lowest finish).  \nStatements:  \n\n1. Ada finished above Mel → Ada has a better (smaller number) position than Mel.  \n2. Ada finished third-to-last → 3rd from last = position 5 (since last is 7, 2nd last is 6, 3rd last is 5). So Ada is 5th.  \n3. Amy finished above Ana → Amy < Ana in position number (smaller = better).  \n4. Mya finished second-to-last → position 6.  \n5. Joe finished above Amy → Joe < Amy in position number.  \n6. Eli finished below Ana → Eli > Ana in position number.  \n\nStep 2: Fill known positions  \nFrom (2) and (4):  \nPosition 5: Ada  \nPosition 6: Mya  \n\nFrom (1) Ada above Mel → Mel must be below Ada, so Mel is position 7 (since 6 is Mya).  \nSo:  \nPos 7: Mel  \n\nStep 3: Remaining positions  \nRemaining positions: 1, 2, 3, 4.  \nRemaining golfers: Ana, Amy, Joe, Eli.  \n\nConstraints:  \n• Amy above Ana → Amy < Ana in position number.  \n\n• Joe above Amy → Joe < Amy.  \n\n• Eli below Ana → Eli > Ana.  \n\nSo: Joe < Amy < Ana < Eli in position numbers.  \n\nStep 4: Assign positions 1–4  \nPositions 1–4 must be Joe, Amy, Ana, Eli in that order (since Joe best of them, Amy next, Ana next, Eli last of these four).  \n\nSo:  \nPos 1: Joe  \nPos 2: Amy  \nPos 3: Ana  \nPos 4: Eli  \n\nStep 5: Check  \nPositions:  \n1: Joe  \n2: Amy  \n3: Ana  \n4: Eli  \n5: Ada  \n6: Mya  \n7: Mel  \n\nAll constraints:  \n• Ada (5) above Mel (7) ✓  \n\n• Ada 3rd-to-last (5th) ✓  \n\n• Amy (2) above Ana (3) ✓  \n\n• Mya 2nd-to-last (6th) ✓  \n\n• Joe (1) above Amy (2) ✓  \n\n• Eli (4) below Ana (3)? Wait — Eli (4) is below Ana (3) means Eli’s position number is greater than Ana’s. 4 > 3 ✓  \n\nStep 6: Who is 4th?  \nPosition 4 is Eli.  \n\nOptions:  \nA) Ana finished fourth → No (3rd)  \nB) Eli finished fourth → Yes  \nC) Mya finished fourth → No (6th)  \nD) Amy finished fourth → No (2nd)  \nE) Joe finished fourth → No (1st)  \nF) Mel finished fourth → No (7th)  \nG) Ada finished fourth → No (5th)  \n\nFinal answer:  \nThe correct option is: B"
+  },
+  {
+    "id": "logical_deduction_817",
+    "context": "The following paragraphs each describe a set of seven objects arranged in a fixed order. The statements are logically consistent within each paragraph.\n\nIn a golf tournament, there were seven golfers: Mel, Rob, Eli, Dan, Ana, Ada, and Mya. Ana finished last. Mya finished above Rob. Dan finished above Mya. Rob finished fourth. Eli finished second. Mel finished above Ada.",
+    "question": "Which of the following is true?",
+    "options": [
+      "A) Mel finished last.",
+      "B) Rob finished last.",
+      "C) Eli finished last.",
+      "D) Dan finished last.",
+      "E) Ana finished last.",
+      "F) Ada finished last.",
+      "G) Mya finished last."
+    ],
+    "answer": "E",
+    "reasoning_cot": "Let’s reason through this step by step.  \n\nWe have 7 golfers: Mel, Rob, Eli, Dan, Ana, Ada, Mya.  \nPositions: 1st (highest) to 7th (lowest).  \n\nGiven facts:\n\n1. Ana finished last → Ana is 7th.  \n2. Mya finished above Rob → Mya’s position number < Rob’s position number.  \n3. Dan finished above Mya → Dan’s position < Mya’s position.  \n4. Rob finished fourth → Rob is 4th.  \n5. Eli finished second → Eli is 2nd.  \n6. Mel finished above Ada → Mel’s position < Ada’s position.  \n\nFrom (4) Rob = 4th and (2) Mya above Rob → Mya is 1st, 2nd, or 3rd.  \nBut (5) Eli is 2nd, so Mya could be 1st or 3rd.  \n\nFrom (3) Dan above Mya → Dan is above Mya, so Dan’s position < Mya’s position.  \nIf Mya were 1st, Dan can’t be above her, so Mya cannot be 1st.  \nThus Mya must be 3rd (since 2nd is taken by Eli).  \n\nThen Dan above Mya → Dan is 1st or 2nd, but 2nd is Eli, so Dan must be 1st.  \n\nSo far:  \n1st: Dan  \n2nd: Eli  \n3rd: Mya  \n4th: Rob  \n7th: Ana  \n\nRemaining positions: 5th, 6th for Mel and Ada.  \n\nFrom (6) Mel above Ada → Mel 5th, Ada 6th.  \n\nOrder:  \n1 Dan  \n2 Eli  \n3 Mya  \n4 Rob  \n5 Mel  \n6 Ada  \n7 Ana  \n\nQuestion: Which is true?  \nOptions about who finished last:  \nA) Mel finished last → No.  \nB) Rob finished last → No.  \nC) Eli finished last → No.  \nD) Dan finished last → No.  \nE) Ana finished last → Yes.  \nF) Ada finished last → No (6th).  \nG) Mya finished last → No.  \n\nThe correct option is: E"
+  },
+  {
+    "id": "logical_deduction_818",
+    "context": "The following paragraphs each describe a set of seven objects arranged in a fixed order. The statements are logically consistent within each paragraph.\n\nIn an antique car show, there are seven vehicles: a sedan, a truck, a bus, a station wagon, a tractor, a convertible, and a limousine. The truck is the oldest. The tractor is the newest. The sedan is older than the station wagon. The station wagon is the third-newest. The bus is older than the convertible. The sedan is newer than the convertible.",
+    "question": "Which of the following is true?",
+    "options": [
+      "A) The sedan is the second-newest.",
+      "B) The truck is the second-newest.",
+      "C) The bus is the second-newest.",
+      "D) The station wagon is the second-newest.",
+      "E) The tractor is the second-newest.",
+      "F) The convertible is the second-newest.",
+      "G) The limousine is the second-newest."
+    ],
+    "answer": "G",
+    "reasoning_cot": "Let’s go step by step.  \n\nWe have 7 vehicles, ordered from oldest (1st) to newest (7th).  \n\nFacts given:\n\n1. Truck is the oldest → Truck = position 1.  \n2. Tractor is the newest → Tractor = position 7.  \n3. Sedan is older than the station wagon → Sedan < Station Wagon (in age order, meaning Sedan comes before Station Wagon in the oldest-to-newest list).  \n4. Station wagon is the third-newest → 3rd newest means 5th oldest (since newest = 7, 2nd newest = 6, 3rd newest = 5). So Station Wagon = position 5.  \n5. Bus is older than the convertible → Bus < Convertible.  \n6. Sedan is newer than the convertible → Convertible < Sedan.  \n\nFrom 3, 4, 6:  \nConvertible < Sedan < Station Wagon = position 5.  \nSo Sedan must be before position 5, Convertible before Sedan.  \n\nPossible positions for Sedan: before 5 means 1, 2, 3, or 4. But Truck is 1, so Sedan can be 2, 3, or 4.  \nConvertible must be before Sedan, so Convertible could be 1, 2, or 3 (but not 4 because Sedan would be after Convertible).  \n\nBut Truck is 1, so Convertible cannot be 1. So Convertible is 2 or 3.  \n\nFrom 5: Bus < Convertible.  \nSo Bus must be before Convertible in order.  \nIf Convertible is 2, Bus would have to be 1, but 1 is Truck → impossible.  \nSo Convertible cannot be 2.  \n\nThus Convertible = position 3.  \nThen Bus < Convertible means Bus is 1 or 2. But 1 is Truck, so Bus = 2.  \n\nSo far:  \n1: Truck  \n2: Bus  \n3: Convertible  \n5: Station Wagon  \n7: Tractor  \n\nRemaining positions: 4, 6, and vehicles left: Sedan, Limousine.  \n\nFrom earlier: Convertible (3) < Sedan < Station Wagon (5) → so Sedan must be position 4.  \n\nThen remaining position 6 goes to Limousine.  \n\nFinal order (oldest to newest):  \n1: Truck  \n2: Bus  \n3: Convertible  \n4: Sedan  \n5: Station Wagon  \n6: Limousine  \n7: Tractor  \n\nSecond-newest means position 6. Position 6 is Limousine.  \n\nThe correct option is: G  \n\nThe correct option is: G"
+  },
+  {
+    "id": "logical_deduction_819",
+    "context": "The following paragraphs each describe a set of seven objects arranged in a fixed order. The statements are logically consistent within each paragraph.\n\nA fruit stand sells seven fruits: oranges, watermelons, peaches, pears, kiwis, cantaloupes, and plums. The kiwis are the second-cheapest. The plums are the cheapest. The cantaloupes are less expensive than the watermelons. The oranges are the most expensive. The pears are the third-cheapest. The peaches are the third-most expensive.",
+    "question": "Which of the following is true?",
+    "options": [
+      "A) The oranges are the third-cheapest.",
+      "B) The watermelons are the third-cheapest.",
+      "C) The peaches are the third-cheapest.",
+      "D) The pears are the third-cheapest.",
+      "E) The kiwis are the third-cheapest.",
+      "F) The cantaloupes are the third-cheapest.",
+      "G) The plums are the third-cheapest."
+    ],
+    "answer": "D",
+    "reasoning_cot": "Let’s reason step by step.  \n\nWe have 7 fruits, ranked from cheapest (1st cheapest) to most expensive (7th cheapest = most expensive).  \n\n1. Plums are the cheapest → Plums = 1st cheapest.  \n2. Kiwis are the second-cheapest → Kiwis = 2nd cheapest.  \n3. Pears are the third-cheapest → Pears = 3rd cheapest.  \n4. Peaches are the third-most expensive → 3rd most expensive = 5th cheapest (since 7 total: 7th = most expensive, 6th = 2nd most expensive, 5th = 3rd most expensive). So Peaches = 5th cheapest.  \n5. Oranges are the most expensive → Oranges = 7th cheapest.  \n7. Cantaloupes are less expensive than the watermelons → Cantaloupes < Watermelons in price.  \n\nSo far we have:  \n1: Plums  \n2: Kiwis  \n3: Pears  \n5: Peaches  \n7: Oranges  \n\nRemaining positions: 4th cheapest, 6th cheapest.  \nRemaining fruits: Cantaloupes, Watermelons.  \nSince Cantaloupes < Watermelons, Cantaloupes = 4th cheapest, Watermelons = 6th cheapest.  \n\nFinal order (cheapest to most expensive):  \n1. Plums  \n2. Kiwis  \n3. Pears  \n5. Peaches  \n4. Cantaloupes  \n6. Watermelons  \n7. Oranges  \n\nWait — that’s not in order. Let’s reorder correctly:  \n\n1. Plums  \n2. Kiwis  \n3. Pears  \n4. Cantaloupes  \n5. Peaches  \n6. Watermelons  \n7. Oranges  \n\nNow check:  \n• Kiwis = 2nd cheapest ✅  \n\n• Plums = cheapest ✅  \n\n• Cantaloupes (4) < Watermelons (6) ✅  \n\n• Oranges = 7th ✅  \n\n• Pears = 3rd cheapest ✅  \n\n• Peaches = 5th cheapest = 3rd most expensive ✅  \n\nThe question asks: Which is true?  \nLooking at the options: “The pears are the third-cheapest” is explicitly given and true.  \n\nThe correct option is: D"
+  },
+  {
+    "id": "logical_deduction_820",
+    "context": "The following paragraphs each describe a set of seven objects arranged in a fixed order. The statements are logically consistent within each paragraph.\n\nOn a branch, there are seven birds: a hawk, a raven, a hummingbird, a falcon, an owl, a quail, and a cardinal. The quail is to the left of the hummingbird. The raven is to the right of the hummingbird. The cardinal is the second from the left. The owl is to the left of the cardinal. The raven is the third from the right. The falcon is the rightmost.",
+    "question": "Which of the following is true?",
+    "options": [
+      "A) The hawk is the second from the left.",
+      "B) The raven is the second from the left.",
+      "C) The hummingbird is the second from the left.",
+      "D) The falcon is the second from the left.",
+      "E) The owl is the second from the left.",
+      "F) The quail is the second from the left.",
+      "G) The cardinal is the second from the left."
+    ],
+    "answer": "G",
+    "reasoning_cot": "Let’s go step by step.  \n\nWe have 7 positions: 1 (leftmost) to 7 (rightmost).  \n\n1. \"The cardinal is the second from the left\" → Cardinal is in position 2.  \n2. \"The owl is to the left of the cardinal\" → Owl must be in position 1 (since only position 1 is to the left of position 2).  \n3. \"The raven is the third from the right\" → 7th is rightmost, so 3rd from right = position 5. Raven is in position 5.  \n4. \"The quail is to the left of the hummingbird\" → Q left of H.  \n5. \"The raven is to the right of the hummingbird\" → H is left of Raven (position 5), so H is in position 1–4, but position 1 is Owl, position 2 is Cardinal, so H is in position 3 or 4.  \n6. \"The falcon is the rightmost\" → Falcon is in position 7.  \n\nLet’s test H positions:  \n\nIf H is in position 4:  \n• Q left of H → Q in 1, 2, or 3. But 1 = Owl, 2 = Cardinal, so Q could be in 3.  \n\n• Then positions: 1: Owl, 2: Cardinal, 3: Q, 4: H, 5: Raven, 7: Falcon, 6: Hawk (last remaining bird).  \n\nCheck: Q left of H (3<4), R right of H (5>4), R 3rd from right (5=5), F rightmost (7), O left of C (1<2), C 2nd from left (2). Works.  \n\nIf H is in position 3:  \n• Q left of H → Q in 1 or 2. But 2 = Cardinal, so Q in 1? No, 1 = Owl. So Q in 2? No, 2 = Cardinal. So impossible. So H cannot be in 3.  \n\nSo only H=4 works.  \n\nThus order:  \n1: Owl  \n2: Cardinal  \n3: Quail  \n4: Hummingbird  \n5: Raven  \n6: Hawk  \n7: Falcon  \n\nSecond from left is position 2 → Cardinal.  \n\nThe correct option is: G"
+  },
+  {
+    "id": "logical_deduction_821",
+    "context": "The following paragraphs each describe a set of seven objects arranged in a fixed order. The statements are logically consistent within each paragraph.\n\nIn an antique car show, there are seven vehicles: a station wagon, a limousine, a truck, a minivan, a motorcyle, a hatchback, and a bus. The motorcyle is older than the truck. The station wagon is older than the hatchback. The motorcyle is newer than the hatchback. The bus is the second-newest. The minivan is the oldest. The limousine is older than the station wagon.",
+    "question": "Which of the following is true?",
+    "options": [
+      "A) The station wagon is the third-newest.",
+      "B) The limousine is the third-newest.",
+      "C) The truck is the third-newest.",
+      "D) The minivan is the third-newest.",
+      "E) The motorcyle is the third-newest.",
+      "F) The hatchback is the third-newest.",
+      "G) The bus is the third-newest."
+    ],
+    "answer": "E",
+    "reasoning_cot": "Let’s go step by step.  \n\nWe have 7 vehicles:  \n• Station wagon (SW)  \n\n• Limousine (L)  \n\n• Truck (T)  \n\n• Minivan (MV)  \n\n• Motorcycle (MC)  \n\n• Hatchback (HB)  \n\n• Bus (B)  \n\n1. Interpret age order  \nOlder means it comes earlier in age ranking (1 = oldest, 7 = newest).  \n\nGiven:  \n(1) MC is older than T → MC < T in age rank (smaller rank number = older).  \n(2) SW is older than HB → SW < HB.  \n(3) MC is newer than HB → HB < MC.  \nFrom (2) and (3): HB < MC < T.  \n\nSo: HB older than MC, MC older than T.  \nOrder so far: … HB … MC … T … (from oldest to newest).  \n\n2. Other fixed facts  \n• Bus is the second-newest → B is 6th oldest (i.e., 2nd newest = 6th in age rank 1..7).  \n\n• Minivan is the oldest → MV is 1.  \n\n• Limousine is older than SW → L < SW.  \n\n3. Combine with HB < MC < T  \nWe have: MV = 1 (oldest).  \nUnknown positions for L, SW, HB, MC, T, B, and one more vehicle (the 7th is the newest).  \n\nB = 6.  \nSo newest (7) is not B.  \n\n4. Possible positions  \nSequence: 1 = MV.  \nWe know HB < MC < T.  \nAlso L < SW.  \n\nWhere can HB, MC, T fit?  \nThey are 3 vehicles in a fixed order: HB … MC … T.  \nThey occupy 3 distinct positions.  \n\nAlso, B = 6, so newest (7) is someone else.  \n\n5. Try to place HB-MC-T block  \nThe newest (7) could be T? Possibly, but check:  \nIf T is 7 (newest), then MC is older than T, HB older than MC.  \nBut B is 6, so T=7 works.  \n\nThen MC could be 5? But then HB < MC means HB is 1–4.  \n\nBut we have MV=1, so HB can’t be 1. So HB is 2, 3, or 4.  \n\nAlso L < SW. And SW’s relation to HB? Not given, but SW could be anywhere relative to HB except SW < HB is false (since SW is older than HB, so SW < HB in rank number). Wait, check: \"SW is older than HB\" → SW < HB in rank number (smaller = older). Yes.  \n\nSo SW is older than HB.  \n\nSo ordering: L < SW < HB < MC < T.  \n\nThat’s 5 vehicles in a fixed order: L, SW, HB, MC, T.  \n\n6. Place MV and B and the last vehicle  \nWe have 7 vehicles: MV, L, SW, HB, MC, T, B.  \n\nOrder: MV (1), then L, SW, HB, MC, T, B? But B is 6, so T must be 7 or 5?  \n\nIf B=6, T must be 7 (newest) because T is after MC, and MC is after HB, etc.  \n\nSo:  \nPositions: 1=MV, then L, SW, HB, MC, B, T? But that breaks HB < MC < T if B is between MC and T? No, B=6, T=7 works:  \nOrder: (oldest) 1=MV, 2=L, 3=SW, 4=HB, 5=MC, 6=B, 7=T.  \n\nCheck:  \nL<SW: 2<3 ✓  \nSW<HB: 3<4 ✓  \nHB<MC: 4<5 ✓  \nMC<T: 5<7 ✓  \nB=6 ✓  \nMV=1 ✓  \n\nAll consistent.  \n\n7. Third-newest means 5th oldest (since newest=7, 2nd newest=6, 3rd newest=5).  \n\nFrom above: 5 = MC.  \n\nSo Motorcycle is the third-newest.  \n\n8. Match option  \nE) The motorcycle is the third-newest.  \n\nThe correct option is: E"
+  },
+  {
+    "id": "logical_deduction_822",
+    "context": "The following paragraphs each describe a set of seven objects arranged in a fixed order. The statements are logically consistent within each paragraph.\n\nIn an antique car show, there are seven vehicles: a hatchback, a sedan, a station wagon, a convertible, a tractor, a bus, and a truck. The convertible is the second-newest. The station wagon is newer than the truck. The bus is newer than the hatchback. The truck is the fourth-newest. The station wagon is older than the tractor. The sedan is the oldest.",
+    "question": "Which of the following is true?",
+    "options": [
+      "A) The hatchback is the oldest.",
+      "B) The sedan is the oldest.",
+      "C) The station wagon is the oldest.",
+      "D) The convertible is the oldest.",
+      "E) The tractor is the oldest.",
+      "F) The bus is the oldest.",
+      "G) The truck is the oldest."
+    ],
+    "answer": "B",
+    "reasoning_cot": "Let’s go step by step.  \n\nWe have 7 vehicles:  \nHatchback (H), Sedan (S), Station Wagon (W), Convertible (C), Tractor (T), Bus (B), Truck (K).  \n\nOrder: newest (1) to oldest (7).  \n\nFacts:  \n\n1. The convertible is the second-newest.  \n   → C is in position 2.  \n\n2. The truck is the fourth-newest.  \n   → K is in position 4.  \n\n3. The station wagon is newer than the truck.  \n   → W is newer than K → W must be in position 1, 2, or 3. But position 2 is C, so W is in 1 or 3.  \n\n4. The station wagon is older than the tractor.  \n   → W older than T → T is newer than W.  \n   If W is in 1, then T would have to be newer than 1 → impossible (no position newer than 1).  \n   So W cannot be in 1.  \n   → W must be in 3.  \n   Then T is newer than W → T must be in 1 or 2. But 2 is C, so T must be in 1.  \n\nSo far:  \n1: Tractor (T)  \n2: Convertible (C)  \n3: Station Wagon (W)  \n4: Truck (K)  \n\n5. The bus is newer than the hatchback.  \n   → B newer than H.  \n\n6. The sedan is the oldest.  \n   → S is in position 7.  \n\nRemaining positions: 5, 6, 7.  \nVehicles left: H, B, S.  \nS is 7 (oldest).  \nSo positions 5 and 6 are for H and B, with B newer than H.  \nThus:  \n5: Bus (B)  \n6: Hatchback (H)  \n7: Sedan (S)  \n\nFinal order (1=newest to 7=oldest):  \n1: T  \n2: C  \n3: W  \n4: K  \n5: B  \n6: H  \n7: S  \n\nQuestion: Which is true?  \nOptions about oldest: Oldest is Sedan (S).  \n\nThat’s option B.  \n\nThe correct option is: B"
+  },
+  {
+    "id": "logical_deduction_823",
+    "context": "The following paragraphs each describe a set of seven objects arranged in a fixed order. The statements are logically consistent within each paragraph.\n\nOn a shelf, there are seven books: a brown book, a green book, a black book, an orange book, a white book, a blue book, and a gray book. The brown book is the rightmost. The black book is to the right of the white book. The gray book is the third from the left. The orange book is to the right of the gray book. The orange book is to the left of the green book. The blue book is the third from the right.",
+    "question": "Which of the following is true?",
+    "options": [
+      "A) The brown book is the third from the left.",
+      "B) The green book is the third from the left.",
+      "C) The black book is the third from the left.",
+      "D) The orange book is the third from the left.",
+      "E) The white book is the third from the left.",
+      "F) The blue book is the third from the left.",
+      "G) The gray book is the third from the left."
+    ],
+    "answer": "G",
+    "reasoning_cot": "Let’s number positions 1 (leftmost) to 7 (rightmost).\n\n1. Brown is rightmost → Brown = position 7.  \n2. Gray is third from the left → Gray = position 3.  \n3. Orange is to the right of Gray → Orange > 3.  \n4. Orange is to the left of Green → Orange < Green.  \n5. Black is to the right of White → Black > White.  \n6. Blue is third from the right → Blue = position 5 (since positions 1–7, third from right is 7-2=5).  \n\nFrom (3) and (4): Gray=3, Orange >3, Green > Orange.  \nFrom (6): Blue=5.  \n\nPossible positions for Orange: 4 or 5 or 6. But Blue=5, so Orange could be 4 or 6.  \n\nIf Orange=6, then Green would be 7, but 7 is Brown → impossible. So Orange ≠ 6.  \nThus Orange = 4. Then Green > 4, Green ≠ 5 (Blue), Green ≠ 7 (Brown), so Green = 6.  \n\nSo far:  \nPos1: ?  \nPos2: ?  \nPos3: Gray  \nPos4: Orange  \nPos5: Blue  \nPos6: Green  \nPos7: Brown  \n\nRemaining colors: Black, White.  \nBlack > White (from 5). Remaining positions: 1, 2.  \nBlack > White means White=1, Black=2.  \n\nFinal order:  \n1: White  \n2: Black  \n3: Gray  \n4: Orange  \n5: Blue  \n6: Green  \n7: Brown  \n\nThird from the left is position 3 → Gray.  \n\nThe correct option is: G"
+  },
+  {
+    "id": "logical_deduction_824",
+    "context": "The following paragraphs each describe a set of seven objects arranged in a fixed order. The statements are logically consistent within each paragraph.\n\nOn a branch, there are seven birds: a hawk, a hummingbird, a quail, an owl, a crow, a robin, and a cardinal. The cardinal is the second from the right. The hawk is the rightmost. The owl is to the left of the hummingbird. The robin is to the left of the quail. The owl is to the right of the crow. The robin is the fourth from the left.",
+    "question": "Which of the following is true?",
+    "options": [
+      "A) The hawk is the fourth from the left.",
+      "B) The hummingbird is the fourth from the left.",
+      "C) The quail is the fourth from the left.",
+      "D) The owl is the fourth from the left.",
+      "E) The crow is the fourth from the left.",
+      "F) The robin is the fourth from the left.",
+      "G) The cardinal is the fourth from the left."
+    ],
+    "answer": "F",
+    "reasoning_cot": "Let’s go step-by-step.\n\nStep 1: Fixed positions given directly  \n• 7 positions: 1 (leftmost) to 7 (rightmost).  \n\n• \"The cardinal is the second from the right\" → position 6.  \n\n• \"The hawk is the rightmost\" → position 7.  \n\n• \"The robin is the fourth from the left\" → position 4.  \n\nSo far:  \nPositions: 1: ?, 2: ?, 3: ?, 4: Robin, 5: ?, 6: Cardinal, 7: Hawk.\n\nStep 2: Owl is to the left of hummingbird (O < H)  \nOwl is to the right of crow (C < O).  \nSo: C < O < H.\n\nStep 3: Robin is to the left of quail (R < Q)  \nR is at 4, so Q must be in positions 5, 6, or 7.  \nBut pos 6 = Cardinal, pos 7 = Hawk, so Q must be in position 5.  \n\nThus:  \nPos 5 = Quail.\n\nStep 4: Remaining birds  \nBirds: Hawk (7), Hummingbird, Quail (5), Owl, Crow, Robin (4), Cardinal (6).  \nRemaining to place: Hummingbird, Owl, Crow in positions 1, 2, 3 (since 4,5,6,7 are taken by R, Q, Crd, H).\n\nStep 5: Apply C < O < H  \nPositions available: 1, 2, 3.  \nC < O < H means:  \nC must be in the smallest position of {1,2,3} that is less than O’s, and O’s less than H’s.  \n\nOnly way in 3 positions: C=1, O=2, H=3.  \n\nSo:  \nPos 1 = Crow, Pos 2 = Owl, Pos 3 = Hummingbird.\n\nStep 6: Final arrangement  \n1: Crow  \n2: Owl  \n3: Hummingbird  \n4: Robin  \n5: Quail  \n6: Cardinal  \n7: Hawk\n\nStep 7: Check the question  \n\"Which of the following is true?\"  \nOptions about \"fourth from the left\" = position 4 = Robin.  \nThat’s option F.\n\nThe correct option is: F"
+  },
+  {
+    "id": "logical_deduction_825",
+    "context": "The following paragraphs each describe a set of seven objects arranged in a fixed order. The statements are logically consistent within each paragraph.\n\nOn a shelf, there are seven books: a black book, a yellow book, a white book, a gray book, a purple book, an orange book, and a green book. The green book is to the left of the gray book. The gray book is the third from the right. The white book is the rightmost. The orange book is the second from the left. The black book is to the right of the yellow book. The black book is the third from the left.",
+    "question": "Which of the following is true?",
+    "options": [
+      "A) The black book is the second from the left.",
+      "B) The yellow book is the second from the left.",
+      "C) The white book is the second from the left.",
+      "D) The gray book is the second from the left.",
+      "E) The purple book is the second from the left.",
+      "F) The orange book is the second from the left.",
+      "G) The green book is the second from the left."
+    ],
+    "answer": "F",
+    "reasoning_cot": "Let’s reason step by step.  \n\nWe have 7 positions: 1 (leftmost) to 7 (rightmost).  \n\n1. \"The gray book is the third from the right.\"  \n   Third from the right means position 5 (since positions: 7, 6, 5 are the three rightmost; 5 is third from right).  \n   So Gray = position 5.  \n\n2. \"The white book is the rightmost.\"  \n   White = position 7.  \n\n3. \"The green book is to the left of the gray book.\"  \n   Green is left of Gray (position 5), so Green is in position 1, 2, 3, or 4.  \n\n4. \"The orange book is the second from the left.\"  \n   Orange = position 2.  \n\n5. \"The black book is the third from the left.\"  \n   Black = position 3.  \n\n6. \"The black book is to the right of the yellow book.\"  \n   Yellow is to the left of Black (position 3), so Yellow is in position 1 or 2. But position 2 is Orange, so Yellow must be position 1.  \n\nSo far:  \n1: Yellow  \n2: Orange  \n3: Black  \n5: Gray  \n7: White  \n\nRemaining positions: 4 and 6.  \nRemaining books: Purple, Green.  \n\n7. \"Green is to the left of Gray (position 5).\"  \n   Green could be position 4 (since 4 is left of 5) or earlier, but earlier positions 1–3 are taken. So Green = position 4.  \n\nThen Purple = position 6.  \n\nFinal order:  \n1: Yellow  \n2: Orange  \n3: Black  \n4: Green  \n5: Gray  \n6: Purple  \n7: White  \n\nThe question asks: Which of the following is true?  \nOptions about \"second from the left\" (position 2) — that’s Orange.  \n\nThe correct option is: F"
+  },
+  {
+    "id": "logical_deduction_826",
+    "context": "The following paragraphs each describe a set of seven objects arranged in a fixed order. The statements are logically consistent within each paragraph.\n\nOn a branch, there are seven birds: a cardinal, a blue jay, a robin, a crow, a falcon, a hawk, and a raven. The hawk is the second from the right. The raven is the fourth from the left. The robin is the second from the left. The cardinal is to the left of the raven. The falcon is to the left of the robin. The crow is to the right of the blue jay.",
+    "question": "Which of the following is true?",
+    "options": [
+      "A) The cardinal is the second from the right.",
+      "B) The blue jay is the second from the right.",
+      "C) The robin is the second from the right.",
+      "D) The crow is the second from the right.",
+      "E) The falcon is the second from the right.",
+      "F) The hawk is the second from the right.",
+      "G) The raven is the second from the right."
+    ],
+    "answer": "F",
+    "reasoning_cot": "Let’s reason step by step.  \n\nWe have 7 positions: 1 (leftmost) to 7 (rightmost).  \n\n1. Hawk is second from the right → position 6.  \n2. Raven is fourth from the left → position 4.  \n3. Robin is second from the left → position 2.  \n4. Cardinal is to the left of the raven → Cardinal is in position 1, 2, or 3, but position 2 is Robin, so Cardinal is in 1 or 3.  \n5. Falcon is to the left of the robin → Robin is in position 2, so Falcon must be in position 1.  \n   • So Falcon is position 1, Robin is position 2.  \n\n   • Cardinal must be in position 3 (since 1 and 2 are taken, and cardinal is left of raven at 4).  \n\n6. Crow is to the right of the blue jay → Blue Jay left of Crow.  \n\nRemaining positions:  \nPositions so far:  \n1: Falcon  \n2: Robin  \n3: Cardinal  \n4: Raven  \n6: Hawk  \n\nRemaining positions: 5 and 7.  \nBirds left: Blue Jay, Crow.  \n\nCrow is to the right of Blue Jay → Blue Jay must be in 5, Crow in 7.  \n\nOrder:  \n1: Falcon  \n2: Robin  \n3: Cardinal  \n4: Raven  \n5: Blue Jay  \n6: Hawk  \n7: Crow  \n\nSecond from the right is position 6 → Hawk.  \n\nThe correct option is: F  \n\nThe correct option is: F"
+  },
+  {
+    "id": "logical_deduction_827",
+    "context": "The following paragraphs each describe a set of seven objects arranged in a fixed order. The statements are logically consistent within each paragraph.\n\nOn a shelf, there are seven books: a purple book, a green book, a white book, a gray book, a red book, a black book, and a brown book. The gray book is to the left of the purple book. The white book is to the right of the brown book. The black book is the third from the right. The purple book is to the left of the white book. The white book is the second from the right. The gray book is the third from the left. The brown book is to the right of the green book.",
+    "question": "Which of the following is true?",
+    "options": [
+      "A) The purple book is the leftmost.",
+      "B) The green book is the leftmost.",
+      "C) The white book is the leftmost.",
+      "D) The gray book is the leftmost.",
+      "E) The red book is the leftmost.",
+      "F) The black book is the leftmost.",
+      "G) The brown book is the leftmost."
+    ],
+    "answer": "B",
+    "reasoning_cot": "Let’s break this down step by step.\n\nStep 1: Interpret given conditions\n\nWe have 7 positions: 1 (leftmost) to 7 (rightmost).  \nStatements:\n\n1. \"Gray book is to the left of Purple book\" → GRAY before PURPLE (GRAY < PURPLE in position number).\n2. \"White book is to the right of Brown book\" → BROWN before WHITE.\n3. \"Black book is the third from the right\" → position 5 (since positions from left: 1,2,3,4,5,6,7; 3rd from right is 5).\n4. \"Purple book is to the left of White book\" → PURPLE before WHITE.\n5. \"White book is the second from the right\" → position 6.\n6. \"Gray book is the third from the left\" → position 3.\n7. \"Brown book is to the right of Green book\" → GREEN before BROWN.\n\nStep 2: Fix absolute positions\n\nFrom (5): WHITE = pos 6.  \nFrom (3): BLACK = pos 5.  \nFrom (6): GRAY = pos 3.\n\nFrom (1): GRAY(3) < PURPLE → PURPLE is in pos 4 or pos ??? Wait, pos 4, 5, 6, 7 possible, but pos 5 is BLACK, pos 6 is WHITE, so PURPLE can be 4 or 7? But PURPLE < WHITE from (4), WHITE=6, so PURPLE < 6 → PURPLE in {1,2,3,4,5}, but GRAY=3 < PURPLE → PURPLE in {4,5}. But pos 5 is BLACK, so PURPLE = 4.\n\nSo PURPLE = 4.\n\nStep 3: Brown and White\n\nFrom (2): BROWN < WHITE(6) → BROWN in {1,2,3,4,5}.  \nFrom (7): GREEN < BROWN.\n\nFrom (4): PURPLE(4) < WHITE(6) — already satisfied.\n\nStep 4: Brown’s position\n\nPossible BROWN positions: BROWN < WHITE, BROWN ≠ GRAY(3), PURPLE(4), BLACK(5), WHITE(6).  \nAlso BROWN ≠ PURPLE, BLACK, WHITE, GRAY. Remaining possible positions for BROWN: {1,2,7}? Wait, BROWN < WHITE(6), so BROWN in {1,2,3,4,5}, but 3=GRAY, 4=PURPLE, 5=BLACK, so BROWN in {1,2}.  \n\nStep 5: Green < Brown\n\nIf BROWN in {1,2}, then GREEN < BROWN:  \n• If BROWN=2, GREEN=1.  \n\n• If BROWN=1, GREEN<1 impossible. So BROWN cannot be 1.  \n\nThus BROWN = 2, GREEN = 1.\n\nStep 6: Remaining color and position\n\nColors: Purple(4), Gray(3), White(6), Black(5), Brown(2), Green(1). Missing: Red.  \nRemaining position: 7. So RED = 7.\n\nOrder:  \n1: GREEN  \n2: BROWN  \n3: GRAY  \n4: PURPLE  \n5: BLACK  \n6: WHITE  \n7: RED\n\nStep 7: Check all conditions\n\n1. GRAY(3) < PURPLE(4) ✓  \n2. WHITE(6) right of BROWN(2) ✓  \n3. BLACK 3rd from right (5th pos) ✓  \n4. PURPLE(4) < WHITE(6) ✓  \n5. WHITE 2nd from right (pos 6) ✓  \n6. GRAY 3rd from left (pos 3) ✓  \n7. BROWN(2) right of GREEN(1) ✓  \n\nStep 8: Leftmost book\n\nLeftmost = pos 1 = GREEN.\n\nThe correct option is: B"
+  },
+  {
+    "id": "logical_deduction_828",
+    "context": "The following paragraphs each describe a set of seven objects arranged in a fixed order. The statements are logically consistent within each paragraph.\n\nA fruit stand sells seven fruits: watermelons, mangoes, kiwis, pears, cantaloupes, oranges, and peaches. The oranges are more expensive than the peaches. The cantaloupes are the fourth-most expensive. The pears are less expensive than the cantaloupes. The peaches are the second-most expensive. The mangoes are the cheapest. The kiwis are the third-cheapest.",
+    "question": "Which of the following is true?",
+    "options": [
+      "A) The watermelons are the most expensive.",
+      "B) The mangoes are the most expensive.",
+      "C) The kiwis are the most expensive.",
+      "D) The pears are the most expensive.",
+      "E) The cantaloupes are the most expensive.",
+      "F) The oranges are the most expensive.",
+      "G) The peaches are the most expensive."
+    ],
+    "answer": "F",
+    "reasoning_cot": "Let’s reason step-by-step.  \n\nWe have 7 fruits: W, M, K, P, C, O, Pe.  \nFrom most expensive (rank 1) to cheapest (rank 7):  \n\n1. \"Cantaloupes are the fourth-most expensive\" → C = rank 4.  \n2. \"Peaches are the second-most expensive\" → Pe = rank 2.  \n3. \"Oranges are more expensive than peaches\" → O > Pe → O must be rank 1 (since Pe is rank 2, the only more expensive rank is 1).  \n4. \"Pears are less expensive than cantaloupes\" → P < C in price means P is cheaper, so P’s rank is higher number than 4 → P is rank 5, 6, or 7.  \n5. \"Mangoes are the cheapest\" → M = rank 7.  \n6. \"Kiwis are the third-cheapest\" → cheapest ranks: 7 (M), 6, 5 are the three cheapest. K is third-cheapest → rank 5.  \n\nSo:  \nRank 5 = K.  \nThus P cannot be rank 5 (since K is rank 5), and P is cheaper than C (rank 4) so P must be rank 6 (since rank 7 is M).  \n\nRemaining ranks: 1, 3, (4=C), (2=Pe), (5=K), (6=P), (7=M).  \nRank 3 and rank 1 are for W and the only fruit left? Let’s list fruits: W, M, K, P, C, O, Pe.  \nAssigned: O=1, Pe=2, C=4, K=5, P=6, M=7.  \nLeft: W and the other fruit? Wait, we have 7 fruits: W, M, K, P, C, O, Pe — all accounted for except W’s rank.  \nWe have rank 3 unassigned. So W = rank 3.  \n\nThus ranking from most expensive (1) to cheapest (7):  \n1: O  \n2: Pe  \n3: W  \n4: C  \n5: K  \n6: P  \n7: M  \n\nMost expensive = Oranges.  \n\nThe correct option is: F"
+  },
+  {
+    "id": "logical_deduction_829",
+    "context": "The following paragraphs each describe a set of seven objects arranged in a fixed order. The statements are logically consistent within each paragraph.\n\nIn an antique car show, there are seven vehicles: a truck, a convertible, a bus, a station wagon, a minivan, a sedan, and a motorcyle. The bus is newer than the sedan. The motorcyle is older than the truck. The station wagon is older than the motorcyle. The sedan is newer than the convertible. The station wagon is newer than the bus. The minivan is the fourth-newest.",
+    "question": "Which of the following is true?",
+    "options": [
+      "A) The truck is the fourth-newest.",
+      "B) The convertible is the fourth-newest.",
+      "C) The bus is the fourth-newest.",
+      "D) The station wagon is the fourth-newest.",
+      "E) The minivan is the fourth-newest.",
+      "F) The sedan is the fourth-newest.",
+      "G) The motorcyle is the fourth-newest."
+    ],
+    "answer": "E",
+    "reasoning_cot": "Let’s reason through the age order step-by-step.  \n\nWe have 7 vehicles: Truck (T), Convertible (C), Bus (B), Station Wagon (W), Minivan (M), Sedan (S), Motorcycle (R).  \nStatements:  \n\n1. Bus is newer than Sedan → B > S (meaning B is newer, so in age order: S older than B)  \n2. Motorcycle older than Truck → R < T  \n3. Station Wagon older than Motorcycle → W < R  \n4. Sedan newer than Convertible → S > C → C < S  \n5. Station Wagon newer than Bus → W > B (Wait — this contradicts my earlier reading: check wording: \"Station wagon is older than motorcycle\" is statement 3, so W < R. Statement 5: \"Station wagon is newer than bus\" → W > B.)  \n6. Minivan is 4th-newest → M = 4 (1 = newest, 7 = oldest)  \n\nLet’s order them from oldest (7) to newest (1) for clarity.  \n\nFrom (3) W < R (W older than R)  \nFrom (2) R < T (R older than T)  \nSo: W < R < T  (oldest to newest: W older than R older than T)  \n\nFrom (1) B > S (B newer than S) → S < B  \nFrom (4) S > C (S newer than C) → C < S  \nSo: C < S < B  \n\nFrom (5) W > B (W newer than B) → B < W  \n\nBut we have B < W and W < R from earlier — so B < W < R.  \nBut that means B < W < R < T.  \n\nAlso C < S < B.  \n\nSo combining: C < S < B < W < R < T.  \n\nThat’s 6 vehicles in order: C (oldest of these), S, B, W, R, T.  \n\nWe have M fixed as 4th-newest.  \n\nLet’s count newest to oldest:  \nNewest (1) to oldest (7):  \nWe know T is newest (1) from above chain (since T is newer than all others in the chain).  \nR is 2nd-newest.  \nW is 3rd-newest.  \nBut M is 4th-newest — so M must be between B and W? Let’s check:  \n\nFrom C < S < B < W < R < T:  \nOldest to newest: C=7, S=6, B=5, W=4?? But W is 3rd-newest (since R=2, T=1). Let’s map carefully:  \n\nOldest to newest:  \n7: C  \n6: S  \n5: B  \n4: W? No — W < R < T means W is 3rd oldest from the top? Let’s reverse:  \n\nNewest to oldest:  \n1: T  \n2: R  \n3: W  \n4: ? (must be M)  \n5: B  \n6: S  \n7: C  \n\nCheck B < W: B is older than W, so B is 5, W is 3 — yes.  \nC < S: C is 7, S is 6 — yes.  \nS < B: S=6, B=5 — yes.  \nW < R: W=3, R=2 — yes.  \nR < T: R=2, T=1 — yes.  \n\nM is 4th-newest, so M=4.  \n\nSo order newest (1) to oldest (7):  \n1: T  \n2: R  \n3: W  \n4: M  \n5: B  \n6: S  \n7: C  \n\nThus 4th-newest is M.  \n\nThe correct option is: E"
   }
 ]
