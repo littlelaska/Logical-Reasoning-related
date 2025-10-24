@@ -130,6 +130,8 @@ def parse_args():
     parser.add_argument('--result_path', type=str, default='./results')
     # laska 新增，针对不同的icl设置，文件名会有不同
     parser.add_argument('--zero-shot', default=False, action='store_true')
+    parser.add_argument('--db_name', type=str, default='gsm8k', help="所使用的RAG db的名字")  # 用于检索的数据库名称
+    parser.add_argument('--icl_num', type=int, default=2, help="RAG检索后使用的示例个数")  # RAG检索后使用的示例个数
     args = parser.parse_args()
     return args
 
@@ -139,6 +141,9 @@ if __name__ == "__main__":
         testing_type = '0-shot'
     else:
         testing_type = 'few-shot'
-    result_file = os.path.join(args.result_path, f'{args.mode}_{testing_type}_{args.dataset_name}_{args.split}_{args.model_name}.json')
+    if args.mode in ["Direct", "CoT"]:
+        result_file = os.path.join(args.result_path, f'{args.mode}_{testing_type}_{args.dataset_name}_{args.split}_{args.model_name}.json')
+    elif args.mode == "RAG":
+        result_file = os.path.join(args.result_path, f'{args.mode}{args.icl_num}_{args.db_name}_{args.dataset_name}_{args.split}_{args.model_name}.json')
     evaluate_QA(result_file)
     print("当前验证的文件为：", result_file)

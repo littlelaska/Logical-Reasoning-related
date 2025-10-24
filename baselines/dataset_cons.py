@@ -50,12 +50,13 @@ class DatasetCons:
             print(type(item_list), len(item_list))
             for item in item_list:
                 context = item.get("context", "")
-                explanation = item.get("explanation", "")
+                explanation = "\n".join(item.get("explanation", ""))
                 question = item.get("question", "")
                 answer = item.get("answer", "")
+                options = item.get("options", "")
                 # full_prompt = f"Context: {context}\nQuestion: {question}\nExplanation: {explanation}"
                 full_prompt = f"Context: {context}\nQuestion: {question}\n"
-                documents.append(Document(page_content=full_prompt, metadata={"answer": answer, "explanation": explanation, "question": question, "context": context}))
+                documents.append(Document(page_content=full_prompt, metadata={"answer": answer, "explanation": explanation, "question": question, "context": context, "options": options}))
         return documents
 
     def build_vector_store(self, index_path):
@@ -75,7 +76,6 @@ class DatasetCons:
         vector_store.save_local(save_index_path)
         print(f"Vector store saved to {save_index_path}")
 
-
 # 构建一个利用langchain数据库进行处理的类
 class DatasetRetriever:
     def __init__(self, index_path, db_name, embedding_model_name="GanymedeNil/text2vec-large-chinese"):
@@ -89,24 +89,53 @@ class DatasetRetriever:
 
     def retrieve(self, query, k=5):
         results = self.vector_store.similarity_search(query, k=k)
-        return results
+        retrieve_list = []
+        for i, doc in enumerate(results):
+            # print(f"Result {i+1}:")
+            # print("Content:", doc.page_content)
+            # print("Metadata:", doc.metadata)
+            # print("-------------------")
+            page_content = doc.page_content
+            metadata = doc.metadata
+            if self.db_name == "gsm8k":
+                context = ""
+                question = page_content
+                answer = metadata.get("answer", "")
+                options = ""
+                cot = metadata.get("cot", "")
+            elif self.db_name == "prontoqa":
+                context = metadata.get("context", "")
+                question = metadata.get("question", "")
+                options = metadata.get("options", "")
+                answer = metadata.get("answer", "")
+                cot = metadata.get("explanation", "")    
+            else:
+                pass
+            # 如果检索的数据库和测试数据库是同一个，去掉和query相同的检索结果
+            if question in query and context in query:
+                continue
+            retrieve_list.append({
+                "context": context,
+                "question": question,
+                "options": options,
+                "answer": answer,
+                "cot": cot
+            })
+        return retrieve_list
 
 if __name__ == "__main__":
     # 构建langchain检索向量数据库
     dataset_cons = DatasetCons(dataset_name="gsm8k", data_path="../data/gsm8k")
-    # dataset_cons = DatasetCons(dataset_name="prontoqa", data_path="../data/ProntoQA")
+    dataset_cons = DatasetCons(dataset_name="prontoqa", data_path="../data/ProntoQA")
     dataset_cons.build_vector_store("../rag_db")
 
     # 利用构建好的检索向量数据库进行实验
-    # dataset_retriever = DatasetRetriever(index_path="../rag_db", db_name="prontoqa")
-    dataset_retriever = DatasetRetriever(index_path="../rag_db", db_name="gsm8k")
+    dataset_retriever = DatasetRetriever(index_path="../rag_db", db_name="prontoqa")
+    # dataset_retriever = DatasetRetriever(index_path="../rag_db", db_name="gsm8k")
     context = "Jompuses are not shy. Jompuses are yumpuses. Each yumpus is aggressive. Each yumpus is a dumpus. Dumpuses are not wooden. Dumpuses are wumpuses. Wumpuses are red. Every wumpus is an impus. Each impus is opaque. Impuses are tumpuses. Numpuses are sour. Tumpuses are not sour. Tumpuses are vumpuses. Vumpuses are earthy. Every vumpus is a zumpus. Zumpuses are small. Zumpuses are rompuses. Max is a yumpus."
     question = "Is the following statement true or false? Max is sour."
     query = f"Context: {context}\nQuestion: {question}\n"
     results = dataset_retriever.retrieve(query, k=3)
-    for i, doc in enumerate(results):
-        print(f"Result {i+1}:")
-        print("Content:", doc.page_content)
-        print("Metadata:", doc.metadata)
-        print("-------------------")
+    print(results)
+    print(len(results))
 
