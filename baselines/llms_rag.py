@@ -38,6 +38,10 @@ class LLM_Reasoning_Graph_Baseline:
 
         # 统一定义存储路径
         self.save_file = os.path.join(self.save_path, f'{self.mode}{self.rag_icl_num}_{self.db_name}_{self.dataset_name}_{self.split}_{self.model_name}.json')
+        # laska定义一个保存检索中间结果的文件
+        self.retrieval_save_file = os.path.join(self.save_path, f'retrieval_{self.db_name}_{self.dataset_name}_{self.split}.json')   # 只与文件有关
+        self.retrieval_writer = open(self.retrieval_save_file, 'w')
+
         # 加载模型 
         if self.model_name == "qwen7":
             self.model_path = "../llms/Qwen2.5-7B-Instruct"
@@ -116,6 +120,14 @@ class LLM_Reasoning_Graph_Baseline:
             {"role":"user", "content": full_prompt}
             ]
         # laska 修改，针对本地模型，返回messages
+        # 每检索一条，将检索结果写入文件
+        retrieval_record = {
+            'context': test_example['context'],
+            'question': test_example['question'],
+            'retrieved_demonstrations': full_in_context_example
+        }
+        # 写入json文件
+        self.retrieval_writer.write(json.dumps(retrieval_record, ensure_ascii=False) + '\n')
         return messages
         
  
@@ -224,6 +236,7 @@ class LLM_Reasoning_Graph_Baseline:
         else:
             print("进行单条测试")
             self.reasoning_graph_generation()
+        self.retrieval_writer.close()   
 
     def reasoning_graph_generation(self):
         # load raw dataset
