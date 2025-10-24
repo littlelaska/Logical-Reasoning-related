@@ -26,6 +26,7 @@ class LLM_Reasoning_Graph_Baseline:
         self.vllm_switch = args.use_vllm  # 是否使用vllm进行加速
         self.max_new_tokens = args.max_new_tokens
         self.zero_shot = args.zero_shot
+        self.rag_result_path = args.rag_result_path
         
         # RAG检索器加载部分
         self.db_name = args.db_name 
@@ -39,7 +40,9 @@ class LLM_Reasoning_Graph_Baseline:
         # 统一定义存储路径
         self.save_file = os.path.join(self.save_path, f'{self.mode}{self.rag_icl_num}_{self.db_name}_{self.dataset_name}_{self.split}_{self.model_name}.json')
         # laska定义一个保存检索中间结果的文件
-        self.retrieval_save_file = os.path.join(self.save_path, f'retrieval_{self.db_name}_{self.dataset_name}_{self.split}.json')   # 只与文件有关
+        if not os.path.exists(self.rag_result_path):
+            os.makedirs(self.rag_result_path)
+        self.retrieval_save_file = os.path.join(self.rag_result_path, f'retrieval_{self.db_name}_{self.dataset_name}_{self.split}.json')   # 只与文件有关
         self.retrieval_writer = open(self.retrieval_save_file, 'w')
 
         # 加载模型 
@@ -352,6 +355,7 @@ def parse_args():
     parser.add_argument('--index_path', type=str, default='../rag_db', help="RAG向量数据库的路径")  # RAG向量数据库的路径
     parser.add_argument('--icl_num', type=int, default=2, help="RAG检索后使用的示例个数")  # RAG检索后使用的示例个数
     parser.add_argument('--top_k', type=int, default=4, help="RAG检索的top k个数")  # RAG检索的top k个数
+    parser.add_argument('--rag_result_path', type=str, default='./rag_results', help="RAG检索中间结果的保存路径")  # RAG检索中间结果的保存路径
     args = parser.parse_args()
     return args
 
