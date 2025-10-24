@@ -102,7 +102,7 @@ class LLM_Reasoning_Graph_Baseline:
             overall_demonstration += icl_template.format(
                 context=result['context'],
                 question=result['question'],
-                options='\n'.join([opt.strip() for opt in test_example['options']]),
+                options='\n'.join([opt.strip() for opt in result.get("options", [])]),
                 cot=result['cot'],
                 answer=result['answer']
             ) + "\n"

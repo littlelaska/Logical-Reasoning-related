@@ -26,6 +26,7 @@ class LLM_Reasoning_Graph_Baseline:
         self.vllm_switch = args.use_vllm  # 是否使用vllm进行加速
         self.max_new_tokens = args.max_new_tokens
         self.zero_shot = args.zero_shot
+        self.rag_result_path = args.rag_result_path
         
         # RAG检索器加载部分
         self.db_name = args.db_name 
@@ -38,6 +39,12 @@ class LLM_Reasoning_Graph_Baseline:
 
         # 统一定义存储路径
         self.save_file = os.path.join(self.save_path, f'{self.mode}{self.rag_icl_num}_{self.db_name}_{self.dataset_name}_{self.split}_{self.model_name}.json')
+        # laska定义一个保存检索中间结果的文件
+        if not os.path.exists(self.rag_result_path):
+            os.makedirs(self.rag_result_path)
+        self.retrieval_save_file = os.path.join(self.rag_result_path, f'retrieval_{self.db_name}_{self.dataset_name}_{self.split}.json')   # 只与文件有关
+        self.retrieval_writer = open(self.retrieval_save_file, 'w')
+
         # 加载模型 
         if self.model_name == "qwen7":
             self.model_path = "../llms/Qwen2.5-7B-Instruct"
@@ -95,7 +102,7 @@ class LLM_Reasoning_Graph_Baseline:
             overall_demonstration += icl_template.format(
                 context=result['context'],
                 question=result['question'],
-                options='\n'.join([opt.strip() for opt in test_example['options']]),
+                options='\n'.join([opt.strip() for opt in result.get("options", [])]),
                 cot=result['cot'],
                 answer=result['answer']
             ) + "\n"
@@ -116,6 +123,14 @@ class LLM_Reasoning_Graph_Baseline:
             {"role":"user", "content": full_prompt}
             ]
         # laska 修改，针对本地模型，返回messages
+        # 每检索一条，将检索结果写入文件
+        retrieval_record = {
+            'context': test_example['context'],
+            'question': test_example['question'],
+            'retrieved_demonstrations': full_in_context_example
+        }
+        # 写入json文件
+        self.retrieval_writer.write(json.dumps(retrieval_record, ensure_ascii=False) + '\n')
         return messages
         
  
@@ -224,6 +239,7 @@ class LLM_Reasoning_Graph_Baseline:
         else:
             print("进行单条测试")
             self.reasoning_graph_generation()
+        self.retrieval_writer.close()   
 
     def reasoning_graph_generation(self):
         # load raw dataset
@@ -339,6 +355,7 @@ def parse_args():
     parser.add_argument('--index_path', type=str, default='../rag_db', help="RAG向量数据库的路径")  # RAG向量数据库的路径
     parser.add_argument('--icl_num', type=int, default=2, help="RAG检索后使用的示例个数")  # RAG检索后使用的示例个数
     parser.add_argument('--top_k', type=int, default=4, help="RAG检索的top k个数")  # RAG检索的top k个数
+    parser.add_argument('--rag_result_path', type=str, default='./rag_results', help="RAG检索中间结果的保存路径")  # RAG检索中间结果的保存路径
     args = parser.parse_args()
     return args
 
