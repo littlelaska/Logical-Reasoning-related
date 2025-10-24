@@ -7,7 +7,6 @@ import argparse
 # 尝试使用vllm加速模型推理
 from vllm import LLM, SamplingParams
 import torch
-from dataset_cons import DatasetRetriever
 
 class LLM_Reasoning_Graph_Baseline:
     def __init__(self, args):
@@ -18,26 +17,20 @@ class LLM_Reasoning_Graph_Baseline:
         self.model_name = args.model_name
         self.save_path = args.save_path
         self.demonstration_path = args.demonstration_path
-        self.mode = args.mode  # Direct or CoT or rag
+        self.mode = args.mode
         #laska 新增部分
+        self.zero_shot = args.zero_shot
+        if self.zero_shot:
+            self.testing_type = "0-shot"
+        else:
+            self.testing_type = "few-shot"
         self.all_data_switch = args.all_data_switch  # 是否对完整数据集进行测试
         self.batch_test = args.batch_test  # 是否进行batch测试
         self.batch_size = args.batch_size  # batch size大小
         self.vllm_switch = args.use_vllm  # 是否使用vllm进行加速
         self.max_new_tokens = args.max_new_tokens
-        self.zero_shot = args.zero_shot
-        
-        # RAG检索器加载部分
-        self.db_name = args.db_name 
-        self.index_path = args.index_path
-        self.dataset_retriever = DatasetRetriever(index_path=self.index_path, db_name=self.db_name)
-        self.rag_topk = args.top_k   # 检索的样例个数
-        self.rag_icl_num = args.icl_num   # 用于上下文学习的展示样例个数
+        print(f"batch_test:{self.batch_test}, zero_shot:{self.zero_shot}, all_data_switch:{self.all_data_switch}, vllm_switch:{self.vllm_switch}")
 
-        print(f"batch_test:{self.batch_test}, demonstration_num:{self.rag_icl_num}, all_data_switch:{self.all_data_switch}, vllm_switch:{self.vllm_switch}, langchain_dataset_name:{self.db_name}, mode:{self.mode}")
-
-        # 统一定义存储路径
-        self.save_file = os.path.join(self.save_path, f'{self.mode}{self.rag_icl_num}_{self.db_name}_{self.dataset_name}_{self.split}_{self.model_name}.json')
         # 加载模型 
         if self.model_name == "qwen7":
             self.model_path = "../llms/Qwen2.5-7B-Instruct"
@@ -59,10 +52,7 @@ class LLM_Reasoning_Graph_Baseline:
         if self.zero_shot:
             self.prompt_creator = self.prompt_LSAT_zero_shot
         else:
-            if self.rag_icl_num > 0:
-                self.prompt_creator = self.rag_prompt_creator
-            else:
-                self.prompt_creator = self.prompt_LSAT
+            self.prompt_creator = self.prompt_LSAT
         self.label_phrase = 'The correct option is:'
         
     # laska 模型加载部分     
@@ -83,42 +73,6 @@ class LLM_Reasoning_Graph_Baseline:
             print("loading complete")
             return tokenizer, model
 
-    # laska 构建使用rag动态变化demonstration的prompt生成器
-    def rag_prompt_creator(self, in_context_example, test_example):
-        # 首先进行检索，得到相关的demonstration
-        query = test_example['question']
-        retrieved_results = self.dataset_retriever.retrieve(query, self.rag_topk)
-        # 制定一个template 
-        icl_template = "Context:\n{context}\nQuestion:\n{question}\nOptions:\n{options}\nReasoning_Process:\n{cot}\nAnswer:\n{answer}\n"
-        overall_demonstration = ""
-        for result in retrieved_results[:self.rag_icl_num]:
-            overall_demonstration += icl_template.format(
-                context=result['context'],
-                question=result['question'],
-                options='\n'.join([opt.strip() for opt in test_example['options']]),
-                cot=result['cot'],
-                answer=result['answer']
-            ) + "\n"
-        head_template = "Given a problem statement as contexts, the task is to answer a logical reasoning question. \n------"
-        full_in_context_example = head_template + "\n" + overall_demonstration
-        # 将需要测试的内容进行拼接
-        test_template = "Context:\n{context}\nQuestion:\n{question}\nOptions:\n{options}\nReasoning:"
-#         print(test_example)
-#         print(test_example["context"])
-        test_example_str = test_template.format(context=test_example['context'],
-                                                question=test_example['question'],
-                                                options='\n'.join([opt.strip() for opt in test_example['options']]))
-        # 拼接成为最终给模型进行测试的样例
-        full_prompt = full_in_context_example + "\n" + test_example_str
-        role_content = "You are a logical task solver. Follow the demonstrationa to solve the new question. Remember to think step by step with concise chain-of-thought, and adhere to the context related to the question. Then on a new line, output exactly: 'The correct option is: A' or 'The correct option is: B"
-        messages = [
-            {"role":"system", "content":role_content},
-            {"role":"user", "content": full_prompt}
-            ]
-        # laska 修改，针对本地模型，返回messages
-        return messages
-        
- 
     # 针对few-shot，生成prompt，该部分完成的是在单个样例之前添加few-shot的示例
     def prompt_LSAT(self, in_context_example, test_example):
         full_prompt = in_context_example
@@ -231,15 +185,14 @@ class LLM_Reasoning_Graph_Baseline:
         print(f"Loaded {len(raw_dataset)} examples from {self.split} split.")
 
         # load in-context examples
-        # in_context_examples = self.load_in_context_examples()
-        in_context_examples = ""
+        in_context_examples = self.load_in_context_examples()
         
         outputs = []
         for example in tqdm(raw_dataset):
             question = example['question']
-            
+
             # create prompt
-            full_prompt = self.prompt_creator(in_context_example, example)
+            full_prompt = self.prompt_creator(in_context_examples, example)
 #             print(full_prompt)
             # 修改这部分模型生成代码
 #             output = self.openai_api.generate(full_prompt)
@@ -267,7 +220,7 @@ class LLM_Reasoning_Graph_Baseline:
                 print(output)
                 break
         # save outputs        
-        with open(self.save_file, 'w') as f:
+        with open(os.path.join(self.save_path, f'{self.mode}_{self.testing_type}_{self.dataset_name}_{self.split}_{self.model_name}.json'), 'w') as f:
             json.dump(outputs, f, indent=2, ensure_ascii=False)
 
     # laska 定义一个batch测试的代码
@@ -277,8 +230,7 @@ class LLM_Reasoning_Graph_Baseline:
         print(f"Loaded {len(raw_dataset)} examples from {self.split} split.")
 
         # load in-context examples
-        # in_context_examples = self.load_in_context_examples()
-        in_context_examples = ""
+        in_context_examples = self.load_in_context_examples()
 
         outputs = []
         # split dataset into chunks
@@ -299,9 +251,46 @@ class LLM_Reasoning_Graph_Baseline:
                 break
             
         # save outputs        
-        with open(self.save_file, 'w') as f:
+        with open(os.path.join(self.save_path, f'{self.mode}_{self.testing_type}_{self.dataset_name}_{self.split}_{self.model_name}.json'), 'w') as f:
             json.dump(outputs, f, indent=2, ensure_ascii=False)
 
+
+    def batch_reasoning_graph_generation_ori(self, batch_size=10):
+        # load raw dataset
+        raw_dataset = self.load_raw_dataset(self.split)
+        print(f"Loaded {len(raw_dataset)} examples from {self.split} split.")
+
+        # load in-context examples
+        in_context_examples = self.load_in_context_examples()
+
+        outputs = []
+        # split dataset into chunks
+        dataset_chunks = [raw_dataset[i:i + batch_size] for i in range(0, len(raw_dataset), batch_size)]
+        for chunk in tqdm(dataset_chunks):
+            # create prompt
+            full_prompts = [self.prompt_creator(in_context_examples, example) for example in chunk]
+            try:
+                batch_outputs = self.openai_api.batch_generate(full_prompts)
+                # create output
+                for sample, output in zip(chunk, batch_outputs):
+                    # get the answer
+                    dict_output = self.update_answer(sample, output)
+                    outputs.append(dict_output)
+            except:
+                # generate one by one if batch generation fails
+                for sample, full_prompt in zip(chunk, full_prompts):
+                    try:
+                        output = self.openai_api.generate(full_prompt)
+                        # get the answer
+                        dict_output = self.update_answer(sample, output)
+                        outputs.append(dict_output)
+                    except:
+                        print('Error in generating example: ', sample['id'])
+
+        # save outputs        
+        with open(os.path.join(self.save_path, f'{self.mode}_{self.dataset_name}_{self.split}_{self.model_name}.json'), 'w') as f:
+            json.dump(outputs, f, indent=2, ensure_ascii=False)
+    
     def update_answer(self, sample, output):
         label_phrase = self.label_phrase
         generated_answer = output.split(label_phrase)[-1].strip()
@@ -324,7 +313,7 @@ def parse_args():
 #     parser.add_argument('--model_path', type=str, default='../llms')
     parser.add_argument('--model_name', type=str)
     parser.add_argument('--stop_words', type=str, default='------')
-    parser.add_argument('--mode', type=str, help='Direct or CoT/此处支持rag')
+    parser.add_argument('--mode', type=str)
     parser.add_argument('--max_new_tokens', type=int)
     # laska定义一个针对0-shot的代码
     parser.add_argument('--zero-shot', default=False, action='store_true')
@@ -335,10 +324,6 @@ def parse_args():
     parser.add_argument('--use_vllm', default=False, action='store_true')
     # laska 定义一个针对是否对完整数据集进行测试的开关
     parser.add_argument('--all_data_switch', help='当前是否需要对所有数据集进行测试(True)，还是测试代码功能(Fasle:只测试一条数据就可以)', default=False, action='store_true')
-    parser.add_argument('--db_name', type=str, default='gsm8k', help="所使用的RAG db的名字")  # 用于检索的数据库名称
-    parser.add_argument('--index_path', type=str, default='../rag_db', help="RAG向量数据库的路径")  # RAG向量数据库的路径
-    parser.add_argument('--icl_num', type=int, default=2, help="RAG检索后使用的示例个数")  # RAG检索后使用的示例个数
-    parser.add_argument('--top_k', type=int, default=4, help="RAG检索的top k个数")  # RAG检索的top k个数
     args = parser.parse_args()
     return args
 
