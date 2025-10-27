@@ -38,6 +38,7 @@ class DatasetCons:
                     documents.append(Document(page_content=question, metadata={"answer": answer, "cot": cot}))
         return documents
     
+    # 10.26 加载逻辑语言的数据集
     def prontoqa_load_data(self, split="dev"):
         "加载prontoqa数据集"
         "split可选 dev"
@@ -125,8 +126,10 @@ class DatasetRetriever:
 
 if __name__ == "__main__":
     # 构建langchain检索向量数据库
-    dataset_cons = DatasetCons(dataset_name="gsm8k", data_path="../data/gsm8k")
-#     dataset_cons = DatasetCons(dataset_name="prontoqa", data_path="../data/ProntoQA")
+    # laska 修改使用逻辑语言来进行icl
+    data_path = "../rag_data"
+#     dataset_cons = DatasetCons(dataset_name="gsm8k", data_path="../data/gsm8k")
+    dataset_cons = DatasetCons(dataset_name="prontoqa", data_path=data_path)
     dataset_cons.build_vector_store("../rag_db")
 
     # 利用构建好的检索向量数据库进行实验
