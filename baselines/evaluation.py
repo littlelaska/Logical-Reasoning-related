@@ -141,7 +141,7 @@ if __name__ == "__main__":
         testing_type = '0-shot'
     else:
         testing_type = 'few-shot'
-    if args.mode in ["Direct", "CoT"]:
+    if args.mode in ["Direct", "CoT", "Logical"]:
         result_file = os.path.join(args.result_path, f'{args.mode}_{testing_type}_{args.dataset_name}_{args.split}_{args.model_name}.json')
     elif args.mode == "RAG":
         result_file = os.path.join(args.result_path, f'{args.mode}{args.icl_num}_{args.db_name}_{args.dataset_name}_{args.split}_{args.model_name}.json')
