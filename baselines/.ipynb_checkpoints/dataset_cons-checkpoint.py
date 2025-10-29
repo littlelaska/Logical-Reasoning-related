@@ -163,7 +163,7 @@ if __name__ == "__main__":
     # laska 修改使用逻辑语言来进行icl
     data_path = "../rag_data"
     dataset_cons = DatasetCons(dataset_name="gsm8k", data_path="../data/gsm8k")
-    dataset_cons.build_vector_store("../rag_db","test")
+    dataset_cons.build_vector_store("../rag_db","train")
 
     dataset_cons = DatasetCons(dataset_name="prontoqa", data_path="../data/ProntoQA")
     dataset_cons.build_vector_store("../rag_db","dev")
