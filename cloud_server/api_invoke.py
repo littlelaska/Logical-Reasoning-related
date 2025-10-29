@@ -77,5 +77,5 @@ class DatasetCotGen:
 
 
 if __name__ == "__main__":
-    dataset_cot_gen = DatasetCotGen(dataset_name="LogicalDeduction", split="train", all_data_switch=False, save_path="./results/")
+    dataset_cot_gen = DatasetCotGen(dataset_name="ProofWriter", split="train", all_data_switch=False, save_path="./results/")
     dataset_cot_gen.retrieve_query_res(all_data_switch=True)

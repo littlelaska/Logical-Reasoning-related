@@ -236,5 +236,12 @@ if __name__ == "__main__":
     key = "TnumU6cM" #服务密钥
     command = "[create_conversation=true]" # 新建对话指令（若想避免历史信息干扰，则每次都把这个command加入到query中）【注意：至少每5-10次query就新建一次对话，以此规避大模型厂商的反扒措施，另外格式不要变，不会影响你的提问，这条指令是给爬虫系统看的，收到这条指令就会在后台新建对话】
     query = "请问最近国际上有什么大事发生？\n请给出一周以内的信息。" # query（举例）
+
+    # laska 10.27测试用模型进行逻辑表达式的生成和推理
+    instruction = "You are a logical reasoning agent. Your task is to solve PrOntoQA logical reasoning questions using strict logic, not intuition. You must (1) translate the natural language statements into formal logical expressions, (2) perform step-by-step symbolic reasoning, and (3) give the final answer. Follow the required output format exactly."
+    query = "Problem:\nEach jompus is fruity. Every jompus is a wumpus. Every wumpus is not transparent. Wumpuses are tumpuses. Tumpuses are mean. Tumpuses are vumpuses. Every vumpus is cold. Each vumpus is a yumpus. Yumpuses are orange. Yumpuses are numpuses. Numpuses are dull. Each numpus is a dumpus. Every dumpus is not shy. Impuses are shy. Dumpuses are rompuses. Each rompus is liquid. Rompuses are zumpuses. Alex is a tumpus.\nQuestion:\nTrue or false: Alex is not shy."
+    if instruction != "":
+        query = instruction + "\n\n" + query
+
     result = api(key, query + command) # 函数api()第一个参数为密钥，第二个参数为发送数据
     print("\n[收到结果]：\n{}".format(result))
