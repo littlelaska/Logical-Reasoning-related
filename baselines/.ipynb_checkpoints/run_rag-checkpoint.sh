@@ -16,7 +16,7 @@ if [ "$ZERO_SHOT" = true ]; then
     
 fi
 echo "Running: $RUN_CMD"
-CUDA_VISIBLE_DEVICES=0,1,2,3 $RUN_CMD
+# CUDA_VISIBLE_DEVICES=0,1,2,3 $RUN_CMD
 echo "Running: $EVA_CMD"
 $EVA_CMD
 

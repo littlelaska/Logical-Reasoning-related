@@ -29,6 +29,14 @@ class LLM_Reasoning_Graph_Baseline:
         self.batch_size = args.batch_size  # batch size大小
         self.vllm_switch = args.use_vllm  # 是否使用vllm进行加速
         self.max_new_tokens = args.max_new_tokens
+
+        # 增加system prompt的加载部分
+        self.system_prompt_path = args.system_prompt_path
+        self.prompt_file = args.prompt_file
+        # 根据prompt type加载不同的system prompt
+        self.system_prompt_file = os.path.join(self.system_prompt_path, self.prompt_file)
+        print(f"system prompt file path: {self.system_prompt_file}")
+
         print(f"batch_test:{self.batch_test}, zero_shot:{self.zero_shot}, all_data_switch:{self.all_data_switch}, vllm_switch:{self.vllm_switch}")
 
         # 加载模型 
@@ -54,7 +62,13 @@ class LLM_Reasoning_Graph_Baseline:
         else:
             self.prompt_creator = self.prompt_LSAT
         self.label_phrase = 'The correct option is:'
-        
+
+    # laska system prompt加载函数
+    def load_system_prompt(self):
+        with open(self.system_prompt_file, 'r') as f:
+            system_prompt = f.read()
+        return system_prompt
+
     # laska 模型加载部分     
     def load_model(self):
         # vllm 新增
@@ -101,7 +115,11 @@ class LLM_Reasoning_Graph_Baseline:
         context = test_example['context'].strip()
         question = test_example['question'].strip()
         options = '\n'.join([opt.strip() for opt in test_example['options']])
-        if self.mode == "Direct":
+        # laska 10.27测试逻辑prompt
+        if self.mode == 'Logical':
+            role_content = self.load_system_prompt()
+            full_prompt = f"Context: {context}\nQuestion: {question}\n"
+        elif self.mode == "Direct":
             role_content = "Answer the question directly, directly give the answer option."
             full_prompt = f"Context: {context}\nQuestion: {question}\nOptions:\n{options}\nPlease answer the question directly, directly give the answer option. The correct option is:"
         elif self.mode == "CoT":
@@ -229,9 +247,11 @@ class LLM_Reasoning_Graph_Baseline:
         raw_dataset = self.load_raw_dataset(self.split)
         print(f"Loaded {len(raw_dataset)} examples from {self.split} split.")
 
-        # load in-context examples
-        in_context_examples = self.load_in_context_examples()
-
+        # load in-context examples,针对非0-shot的场景
+        if not self.zero_shot: 
+            in_context_examples = self.load_in_context_examples()
+        else:
+            in_context_examples = ""
         outputs = []
         # split dataset into chunks
         dataset_chunks = [raw_dataset[i:i + batch_size] for i in range(0, len(raw_dataset), batch_size)]
@@ -292,8 +312,15 @@ class LLM_Reasoning_Graph_Baseline:
             json.dump(outputs, f, indent=2, ensure_ascii=False)
     
     def update_answer(self, sample, output):
-        label_phrase = self.label_phrase
+        if self.mode in ["Direct", "CoT"]:
+            label_phrase = self.label_phrase
+        elif self.mode in ["Logical"]:
+            label_phrase = "Answer:"
         generated_answer = output.split(label_phrase)[-1].strip()
+        if generated_answer.lower() == "true":
+            generated_answer = "A"
+        elif generated_answer.lower() == "false":
+            generated_answer = "B"
         generated_reasoning = output.split(label_phrase)[0].strip()
         dict_output = {'id': sample['id'], 
                         'question': sample['question'], 
@@ -301,6 +328,7 @@ class LLM_Reasoning_Graph_Baseline:
                         'predicted_reasoning': generated_reasoning,
                         'predicted_answer': generated_answer,
                         'generation_context':output}
+
         return dict_output
 
 def parse_args():
@@ -313,7 +341,7 @@ def parse_args():
 #     parser.add_argument('--model_path', type=str, default='../llms')
     parser.add_argument('--model_name', type=str)
     parser.add_argument('--stop_words', type=str, default='------')
-    parser.add_argument('--mode', type=str)
+    parser.add_argument('--mode', type=str, help='Direct or CoT or logical', default='Direct')
     parser.add_argument('--max_new_tokens', type=int)
     # laska定义一个针对0-shot的代码
     parser.add_argument('--zero-shot', default=False, action='store_true')
@@ -324,6 +352,9 @@ def parse_args():
     parser.add_argument('--use_vllm', default=False, action='store_true')
     # laska 定义一个针对是否对完整数据集进行测试的开关
     parser.add_argument('--all_data_switch', help='当前是否需要对所有数据集进行测试(True)，还是测试代码功能(Fasle:只测试一条数据就可以)', default=False, action='store_true')
+    # 10.27 将system prompt放在文件中进行加载
+    parser.add_argument('--system_prompt_path', type=str, default='./system_prompt')
+    parser.add_argument('--prompt_file', help="定义system prompt的文件路径", type=str, default='logical_prompt_1.txt')
     args = parser.parse_args()
     return args
 

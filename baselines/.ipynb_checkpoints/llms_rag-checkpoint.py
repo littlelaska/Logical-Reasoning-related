@@ -96,7 +96,8 @@ class LLM_Reasoning_Graph_Baseline:
         query = test_example['question']
         retrieved_results = self.dataset_retriever.retrieve(query, self.rag_topk)
         # 制定一个template 
-        icl_template = "Context:\n{context}\nQuestion:\n{question}\nOptions:\n{options}\nReasoning_Process:\n{cot}\nAnswer:\n{answer}\n"
+        icl_template = "Context:\n{context}\nQuestion:\n{question}\nOptions:\n{options}\nReasoning:\n{cot}\nAnswer:\n{answer}\n"
+#         icl_template = "Context:\n{context}\nQuestion:\n{question}\nOptions:\nReasoning:\n{cot}\nAnswer:\n{answer}\n"
         overall_demonstration = ""
         for result in retrieved_results[:self.rag_icl_num]:
             overall_demonstration += icl_template.format(

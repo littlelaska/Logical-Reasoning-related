@@ -118,7 +118,7 @@ class LLM_Reasoning_Graph_Baseline:
         # laska 10.27测试逻辑prompt
         if self.mode == 'Logical':
             role_content = self.load_system_prompt()
-            full_prompt = f"Context: {context}\nQuestion: {question}\nOptions:\n{options}\nPlease answer the question based on the above context and options. The correct option is:"
+            full_prompt = f"Context: {context}\nQuestion: {question}\n"
         elif self.mode == "Direct":
             role_content = "Answer the question directly, directly give the answer option."
             full_prompt = f"Context: {context}\nQuestion: {question}\nOptions:\n{options}\nPlease answer the question directly, directly give the answer option. The correct option is:"
@@ -247,9 +247,11 @@ class LLM_Reasoning_Graph_Baseline:
         raw_dataset = self.load_raw_dataset(self.split)
         print(f"Loaded {len(raw_dataset)} examples from {self.split} split.")
 
-        # load in-context examples
-        in_context_examples = self.load_in_context_examples()
-
+        # load in-context examples,针对非0-shot的场景
+        if not self.zero_shot: 
+            in_context_examples = self.load_in_context_examples()
+        else:
+            in_context_examples = ""
         outputs = []
         # split dataset into chunks
         dataset_chunks = [raw_dataset[i:i + batch_size] for i in range(0, len(raw_dataset), batch_size)]
@@ -310,8 +312,15 @@ class LLM_Reasoning_Graph_Baseline:
             json.dump(outputs, f, indent=2, ensure_ascii=False)
     
     def update_answer(self, sample, output):
-        label_phrase = self.label_phrase
+        if self.mode in ["Direct", "CoT"]:
+            label_phrase = self.label_phrase
+        elif self.mode in ["Logical"]:
+            label_phrase = "Answer:"
         generated_answer = output.split(label_phrase)[-1].strip()
+        if generated_answer.lower() == "true":
+            generated_answer = "A"
+        elif generated_answer.lower() == "false":
+            generated_answer = "B"
         generated_reasoning = output.split(label_phrase)[0].strip()
         dict_output = {'id': sample['id'], 
                         'question': sample['question'], 
@@ -319,6 +328,7 @@ class LLM_Reasoning_Graph_Baseline:
                         'predicted_reasoning': generated_reasoning,
                         'predicted_answer': generated_answer,
                         'generation_context':output}
+
         return dict_output
 
 def parse_args():
