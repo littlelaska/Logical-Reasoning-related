@@ -1,7 +1,7 @@
 MODE="RAG"
 DATASET_NAME="ProntoQA"
 MODEL_NAME="qwen14"
-LANGCHAIN_DB="gsm8k"
+LANGCHAIN_DB="logicaldeduction"
 RAG_TOPK=5
 DEMONSTRATION_NUM=1
 
@@ -16,7 +16,7 @@ if [ "$ZERO_SHOT" = true ]; then
     
 fi
 echo "Running: $RUN_CMD"
-# CUDA_VISIBLE_DEVICES=0,1,2,3 $RUN_CMD
+CUDA_VISIBLE_DEVICES=0,1,2,3 $RUN_CMD
 echo "Running: $EVA_CMD"
 $EVA_CMD
 

@@ -42,6 +42,10 @@ if __name__=="__main__":
     query = "Context:\nEvery dumpus is not shy. Each dumpus is a tumpus. Rompuses are not wooden. Tumpuses are opaque. Every tumpus is a wumpus. Wumpuses are not floral. Each wumpus is an impus. Impuses are bitter. Every impus is a vumpus. Vumpuses are small. Each vumpus is a numpus. Every numpus is wooden. Each numpus is a yumpus. Each yumpus is orange. Each yumpus is a jompus. Each jompus is amenable. Every jompus is a zumpus. Wren is a tumpus.\n\nQuestion: Is the following statement true or false? Wren is wooden.\nOptions:\nA) True\nB) False\nReasoning:\n"
     
     final_query = icl_prompt+icl_context+query
-    response = generate_answer(model, tokenizer, sampling_params,final_query, system_prompt)
-    print(response)
+    
+    pure_response = generate_answer(model, tokenizer, sampling_params, query, system_prompt)
+    print(pure_response)
+    print("-------------")
+    rag_response = generate_answer(model, tokenizer, sampling_params,final_query, system_prompt)
+    print(rag_response)
     
