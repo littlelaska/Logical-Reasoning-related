@@ -46,6 +46,26 @@ class DatasetCotGen:
             print(f"[WARN] 目标 {CLOUD_IP}:{CLOUD_PORT} 未连通，5s 后重试…")
             time.sleep(backoff)
             backoff = min(10.0, backoff * 1.7)  
+    
+    # 定义一个递归二分查找函数，判断哪些数据已经处理过了
+    def binary_search_recursive(self, arr, target_col_name, left=0, right=None):
+        """
+        在有序数组 arr 中递归查找 target。
+        """
+        if right is None:
+            right = len(arr) - 1
+        if left > right:
+            return -1
+        if left == right:
+            return left
+      
+        mid = (left + right) // 2
+        # print(type(arr[mid]))
+        # print(arr[mid])
+        if arr[mid][target_col_name].startswith("[ERROR]"):
+            return self.binary_search_recursive(arr, target_col_name, left, mid)
+        else:
+            return self.binary_search_recursive(arr, target_col_name, mid + 1, right)
 
     # 定义一个请求入口
     def retrieve_query_res(self, all_data_switch=None):
@@ -56,7 +76,24 @@ class DatasetCotGen:
         # 保存结果
         os.makedirs(self.save_path, exist_ok=True)
         savefile_path = os.path.join(self.dataset_path, f"{self.dataset_name}_{self.split}_cot.json")
-        existing_results = []
+        # laska 10.29新增部分代码，支持断点续传
+        if os.path.exists(savefile_path):
+            with open(savefile_path, 'r') as sf:
+                existing_results = json.load(sf)
+            existing_len = len(existing_results)
+            # 用递归查找的方式查找数据处理到哪一条了
+            existing_len = self.binary_search_recursive(
+                existing_results,
+                target_col_name="reasoning_cot"
+            )
+            existing_results = existing_results[:existing_len]
+            # print(existing_results[-1])
+            print(f"[INFO] 发现已存在的结果文件，已加载 {existing_len} 条结果，继续处理剩余数据…")
+            query_data = query_data[existing_len:]  # 只处理剩余的数据
+            print(len(existing_results)+len(query_data)) 
+        else:
+            existing_results = []
+        # exit()
         self.reachability_test()  # 测试联通性
         for item in tqdm(query_data):
             context = item['context'].strip()
@@ -77,5 +114,5 @@ class DatasetCotGen:
 
 
 if __name__ == "__main__":
-    dataset_cot_gen = DatasetCotGen(dataset_name="ProofWriter", split="train", all_data_switch=False, save_path="./results/")
+    dataset_cot_gen = DatasetCotGen(dataset_name="ProofWriter", split="dev", all_data_switch=False, save_path="./results/")
     dataset_cot_gen.retrieve_query_res(all_data_switch=True)
