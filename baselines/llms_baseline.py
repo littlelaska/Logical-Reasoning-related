@@ -16,11 +16,11 @@ import torch
 from datasets import load_dataset, Dataset
 from copy import deepcopy
 
-seed = 42
-random.seed(seed)
-np.random.seed(seed)
-torch.manual_seed(seed)
-torch.cuda.manual_seed_all(seed)
+# seed = 42
+# random.seed(seed)
+# np.random.seed(seed)
+# torch.manual_seed(seed)
+# torch.cuda.manual_seed_all(seed)
 
 
 class LLM_Reasoning_Graph_Baseline:
@@ -167,7 +167,14 @@ class LLM_Reasoning_Graph_Baseline:
             model = LLM(model=self.model_path, tokenizer=self.model_path,tensor_parallel_size=torch.cuda.device_count(), max_model_len=32768,dtype=self.dtype, trust_remote_code=True, gpu_memory_utilization=0.9)
             tokenizer = AutoTokenizer.from_pretrained(self.model_path, padding_side='left')
 #             self.sampling_params = SamplingParams(temperature=0, max_tokens=self.max_new_tokens, top_p=0.95, top_k=40, n=1)
-            self.sampling_params = SamplingParams(temperature=0, max_tokens=self.max_new_tokens, top_p=1, top_k=1, n=1)
+            self.sampling_params = SamplingParams(
+                temperature=0, 
+                max_tokens=self.max_new_tokens, 
+                top_p=1, 
+                top_k=1, 
+                n=1,
+                # seed=42,    # 想要复现结果可以保障随机种子一致
+                )
             return tokenizer, model
         else:
             print("直接加载模型进行推理")
@@ -682,6 +689,7 @@ class LLM_Reasoning_Graph_Baseline:
                 break
         # save outputs        
         with open(self.save_file, 'w') as f:
+            print("saving results to ", self.save_file)
             json.dump(outputs, f, indent=2, ensure_ascii=False)
 
     def update_answer(self, sample, output):

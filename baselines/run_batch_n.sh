@@ -5,8 +5,8 @@
 # ==============================
 MODE="RAG"                     # CoT / Direct / RAG / Logical
 MODEL_NAME="qwen14"            # 给定模型
-RAG_TOPK=10
-BATCH_SIZE=8
+RAG_TOPK=40
+BATCH_SIZE=32
 MAX_NEW_TOKENS=8192
 ZERO_SHOT=false                # 这里只跑 1–4 shot，所以不启用 zero-shot
 DTYPE="float16"
@@ -19,13 +19,15 @@ N_RUNS=30
 
 
 # 源域（demo 来源）
-SOURCE_DOMAINS=("gsm8k" "ProntoQA" "AR-LSAT" "ProofWriter" "FOLIO" "LogicalDeduction")    # "gsm8k" "ProntoQA" "AR-LSAT" "ProofWriter" "FOLIO" "LogicalDeduction"
+# SOURCE_DOMAINS=("gsm8k" "ProntoQA" "AR-LSAT" "ProofWriter" "FOLIO" "LogicalDeduction")    # "gsm8k" "ProntoQA" "AR-LSAT" "ProofWriter" "FOLIO" "LogicalDeduction"
+SOURCE_DOMAINS=("ProofWriter" "FOLIO" "LogicalDeduction")    # "gsm8k" "ProntoQA" "AR-LSAT" "ProofWriter" "FOLIO" "LogicalDeduction"
  
 # 目标域（评测数据集）
 TARGET_DOMAINS=("LogicalDeduction")
 
 # shots: 1, 2, 3, 4
-SHOTS=(0 1 2 3 4 8 16)
+SHOTS=(1 2 3 4 8 16)
+# SHOTS=(8 16)
 
 
 # ==============================
@@ -140,7 +142,7 @@ for SRC in "${SOURCE_DOMAINS[@]}"; do
           echo "-------------------------------------------"
           ${LANGCHAIN_CMD}
           echo "-------------------------------------------"
-          CUDA_VISIBLE_DEVICES=0,1,2,3 ${RUN_CMD}
+          CUDA_VISIBLE_DEVICES=1,2 ${RUN_CMD}
         
           echo "================ EVAL START ================"
           echo "[CMD] ${EVA_CMD}"
