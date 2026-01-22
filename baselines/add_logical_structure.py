@@ -266,7 +266,7 @@ def main():
 
     for in_path in in_files:
         data = _safe_json_load(in_path)
-        data = data[:10]
+
         out_name = os.path.basename(_derive_output_path(os.path.basename(in_path)))
         out_path = _derive_output_path(in_path)
         if args.output_dir:
