@@ -1,8 +1,10 @@
 # aggregate_runs.py
+
+# 该代码用于统计多次运行的结果，计算平均值、标准差、最小值和最大值。
 import re, glob, os
 import numpy as np
 
-PAT = re.compile(r"EM\s*:\s*([0-9]*\.?[0-9]+)")  # 你改成你日志里真实的字段
+PAT = re.compile(r"EM:\s*([0-9]*\.?[0-9]+)")  # 你改成你日志里真实的字段
 
 def extract_acc(log_path):
     txt = open(log_path, "r", encoding="utf-8", errors="ignore").read()

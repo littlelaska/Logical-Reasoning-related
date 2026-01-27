@@ -7,7 +7,7 @@ import json
 import os
 import random
 import re
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 from tqdm import tqdm
@@ -178,31 +178,44 @@ def neighbor_type(t: str) -> str:
 
 
 def build_chat_prompt(tokenizer, messages: List[Dict[str, str]]) -> str:
-    # Qwen2.5 tokenizer supports apply_chat_template
     return tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
 
 
-def predict_structure_with_local_qwen(
+# -----------------------------
+# vLLM batch generation helpers
+# -----------------------------
+def vllm_generate_batch(llm: LLM, prompts: List[str], temperature: float, max_tokens: int) -> List[str]:
+    params = SamplingParams(temperature=temperature, max_tokens=max_tokens)
+    outputs = llm.generate(prompts, params)
+    return [o.outputs[0].text for o in outputs]
+
+
+def predict_structure_batch_with_local_qwen(
     llm: LLM,
     tokenizer,
-    problem_text: str,
+    problem_texts: List[str],
     temperature: float = 0.0,
     max_tokens: int = 256,
-) -> Dict[str, Any]:
-    messages = [
-        {"role": "system", "content": SYSTEM_PROMPT},
-        {"role": "user", "content": USER_TEMPLATE.format(problem=problem_text)},
+) -> List[Dict[str, Any]]:
+    messages_list = [
+        [{"role": "system", "content": SYSTEM_PROMPT},
+         {"role": "user", "content": USER_TEMPLATE.format(problem=pt)}]
+        for pt in problem_texts
     ]
-    prompt = build_chat_prompt(tokenizer, messages)
-    params = SamplingParams(temperature=temperature, max_tokens=max_tokens)
-    out = llm.generate([prompt], params)[0].outputs[0].text
-    obj = extract_json_obj(out)
-    if not obj:
-        return {"structure_type": "Other", "justification": "Local Qwen output not valid JSON."}
-    st = obj.get("structure_type", "Other")
-    if st not in STRUCT_TYPES:
-        st = "Other"
-    return {"structure_type": st, "justification": (obj.get("justification") or "").strip()}
+    prompts = [build_chat_prompt(tokenizer, m) for m in messages_list]
+    texts = vllm_generate_batch(llm, prompts, temperature=temperature, max_tokens=max_tokens)
+
+    out = []
+    for t in texts:
+        obj = extract_json_obj(t)
+        if not obj:
+            out.append({"structure_type": "Other", "justification": "Local Qwen output not valid JSON."})
+            continue
+        st = obj.get("structure_type", "Other")
+        if st not in STRUCT_TYPES:
+            st = "Other"
+        out.append({"structure_type": st, "justification": (obj.get("justification") or "").strip()})
+    return out
 
 
 def build_icl_prompt(demos: List[Dict[str, Any]], query: Dict[str, Any], t_hat: str) -> str:
@@ -230,10 +243,18 @@ def build_icl_prompt(demos: List[Dict[str, Any]], query: Dict[str, Any], t_hat: 
     )
 
 
-def infer_answer_with_local_qwen(llm: LLM, tokenizer, prompt: str, temperature: float, max_tokens: int) -> str:
-    params = SamplingParams(temperature=temperature, max_tokens=max_tokens)
-    out = llm.generate([prompt], params)[0].outputs[0].text
-    return out.strip()
+def build_zero_shot_prompt(query: Dict[str, Any], t_hat: str) -> str:
+    q_parts = ["### Query", f"[Predicted Structure]\n{t_hat}"]
+    ctx = query.get("context")
+    if isinstance(ctx, str) and ctx.strip():
+        q_parts.append("[Context]\n" + ctx.strip())
+    q_parts.append("[Question]\n" + str(query.get("question", "")).strip())
+    opts = query.get("options")
+    if isinstance(opts, list) and len(opts) > 0:
+        q_parts.append("[Options]\n" + "\n".join([str(o) for o in opts]))
+    q_parts.append("[Reasoning]\n")
+    q_parts.append("[Answer]\n")
+    return "Solve the following problem carefully.\n\n" + "\n\n".join(q_parts)
 
 
 def main():
@@ -262,174 +283,222 @@ def main():
     ap.add_argument("--tensor_parallel_size", type=int, default=1)
     ap.add_argument("--gpu_memory_utilization", type=float, default=0.90)
     ap.add_argument("--seed", type=int, default=13)
-
     ap.add_argument("--max_train_per_type", type=int, default=0)
+
+    # NEW: batch sizes
+    ap.add_argument("--struct_batch_size", type=int, default=64)
+    ap.add_argument("--infer_batch_size", type=int, default=16)
+
     args = ap.parse_args()
 
     random.seed(args.seed)
     np.random.seed(args.seed)
 
-    # ---- Load train ----
-    train_files = sorted(glob.glob(args.train_glob))
-    if not train_files:
-        raise SystemExit(f"No train files matched: {args.train_glob}")
-
-    train_all = []
-    for fp in train_files:
-        train_all.extend(load_json_list(fp))
-
-    # filter: must have reasoning_cot + logical_structure
-    flat_train = []
-    flat_type = []
-    for ex in train_all:
-        rc = ex.get("reasoning_cot", "")
-        if not isinstance(rc, str) or not rc.strip():
-            continue
-        t = get_structure_type(ex)
-        if t not in STRUCT_TYPES:
-            continue
-        flat_train.append(ex)
-        flat_type.append(t)
-
-    # optional cap per type
-    if args.max_train_per_type and args.max_train_per_type > 0:
-        by = {t: [] for t in STRUCT_TYPES}
-        for ex in flat_train:
-            by[get_structure_type(ex)].append(ex)
-        flat_train2, flat_type2 = [], []
-        for t in STRUCT_TYPES:
-            pool = by[t]
-            if len(pool) > args.max_train_per_type:
-                pool = random.sample(pool, args.max_train_per_type)
-            for ex in pool:
-                flat_train2.append(ex)
-                flat_type2.append(t)
-        flat_train, flat_type = flat_train2, flat_type2
-
-    train_ids = [normalize_id(ex, i) for i, ex in enumerate(flat_train)]
-    train_texts = [qtext(ex) for ex in flat_train]
-
-    # ---- Local embedding model ----
-    embedder = SentenceTransformer(args.embed_model_path)
-    # encode train
-    train_embs = []
-    for i in tqdm(range(0, len(train_texts), args.embed_batch), desc="Embedding train", ncols=100):
-        batch = train_texts[i:i+args.embed_batch]
-        emb = embedder.encode(batch, batch_size=len(batch), normalize_embeddings=True, show_progress_bar=False)
-        train_embs.append(np.array(emb, dtype=np.float32))
-    train_emb = np.vstack(train_embs)  # [N,d]
-
-    # ---- Local Qwen (optional) ----
     llm = None
-    tokenizer = None
-    if (args.do_struct_predict or args.do_infer) and args.qwen_model_path:
-        llm = LLM(
-            model=args.qwen_model_path,
-            tensor_parallel_size=args.tensor_parallel_size,
-            gpu_memory_utilization=args.gpu_memory_utilization,
-            seed=args.seed,
-            trust_remote_code=True,
-        )
-        tokenizer = AutoTokenizer.from_pretrained(args.qwen_model_path, trust_remote_code=True)
+    try:
+        # ---- Load train ----
+        train_files = sorted(glob.glob(args.train_glob))
+        if not train_files:
+            raise SystemExit(f"No train files matched: {args.train_glob}")
 
-    # ---- Load queries ----
-    queries = load_json_list(args.query_file)
-    out = []
+        train_all = []
+        for fp in train_files:
+            train_all.extend(load_json_list(fp))
 
-    for qex in tqdm(queries, desc="Selecting demos", ncols=100):
-        # ensure structure_type
-        if args.do_struct_predict:
-            if get_structure_type(qex) is None:
-                if llm is None:
-                    qex["logical_structure"] = {"structure_type": "Other", "justification": "No local qwen configured."}
-                else:
-                    pred = predict_structure_with_local_qwen(llm, tokenizer, qtext(qex), temperature=0.0, max_tokens=256)
-                    qex["logical_structure"] = pred
-        else:
-            if get_structure_type(qex) is None:
-                qex["logical_structure"] = {"structure_type": "Other", "justification": "struct predict disabled."}
-
-        t_hat = get_structure_type(qex) or "Other"
-        t2 = neighbor_type(t_hat)
-
-        k = max(0, args.k)
-        k_same = int(round(k * args.same_type_ratio))
-        k_same = min(k_same, k)
-        k_nei = k - k_same
-
-        cand_same = [i for i, t in enumerate(flat_type) if t == t_hat]
-        cand_nei = [i for i, t in enumerate(flat_type) if t == t2]
-        if not cand_same:
-            cand_same = list(range(len(flat_train)))
-        if not cand_nei:
-            cand_nei = list(range(len(flat_train)))
-
-        # embed query
-        q_emb = embedder.encode([qtext(qex)], normalize_embeddings=True, show_progress_bar=False)
-        q_emb = np.array(q_emb[0], dtype=np.float32)
-
-        sim_all = cosine_sim(q_emb, train_emb)  # [N]
-
-        def topn(idxs: List[int], n: int) -> List[int]:
-            n = min(n, len(idxs))
-            sims = sim_all[idxs]
-            order = np.argsort(-sims)[:n]
-            return [idxs[i] for i in order]
-
-        preN = max(args.preN, k * 20)
-        cand_same_top = topn(cand_same, preN)
-        cand_nei_top = topn(cand_nei, preN)
-
-        def mmr_on(cand_top: List[int], kpick: int) -> List[int]:
-            if kpick <= 0 or not cand_top:
-                return []
-            cand_embs = train_emb[cand_top]
-            sim_q = sim_all[cand_top]
-            return mmr_select(cand_top, sim_q, cand_embs, kpick, lambda_div=args.lambda_div)
-
-        pick_same = mmr_on(cand_same_top, k_same)
-        pick_nei = mmr_on(cand_nei_top, k_nei)
-
-        picked = []
-        seen = set()
-        for idx in pick_same + pick_nei:
-            did = train_ids[idx]
-            if did in seen:
+        # filter: must have reasoning_cot + logical_structure
+        flat_train = []
+        flat_type = []
+        for ex in train_all:
+            rc = ex.get("reasoning_cot", "")
+            if not isinstance(rc, str) or not rc.strip():
                 continue
-            picked.append(idx)
-            seen.add(did)
-            if len(picked) >= k:
-                break
+            t = get_structure_type(ex)
+            if t not in STRUCT_TYPES:
+                continue
+            flat_train.append(ex)
+            flat_type.append(t)
 
-        demos = []
-        for idx in picked:
-            demos.append({
-                "demo_id": train_ids[idx],
-                "structure_type": flat_type[idx],
-                "demo_text": build_demo_text(flat_train[idx]),
-            })
+        # optional cap per type
+        if args.max_train_per_type and args.max_train_per_type > 0:
+            by = {t: [] for t in STRUCT_TYPES}
+            for ex in flat_train:
+                by[get_structure_type(ex)].append(ex)
+            flat_train2, flat_type2 = [], []
+            for t in STRUCT_TYPES:
+                pool = by[t]
+                if len(pool) > args.max_train_per_type:
+                    pool = random.sample(pool, args.max_train_per_type)
+                for ex in pool:
+                    flat_train2.append(ex)
+                    flat_type2.append(t)
+            flat_train, flat_type = flat_train2, flat_type2
 
-        qout = dict(qex)
-        qout["icl_demos"] = demos
-        qout["icl_prompt"] = build_icl_prompt(demos, qex, t_hat)
+        train_ids = [normalize_id(ex, i) for i, ex in enumerate(flat_train)]
+        train_texts = [qtext(ex) for ex in flat_train]
 
+        # ---- Local embedding model ----
+        embedder = SentenceTransformer(args.embed_model_path)
+
+        # encode train (already batch)
+        train_embs = []
+        for i in tqdm(range(0, len(train_texts), args.embed_batch), desc="Embedding train", ncols=100):
+            batch = train_texts[i:i + args.embed_batch]
+            emb = embedder.encode(batch, batch_size=len(batch), normalize_embeddings=True, show_progress_bar=False)
+            train_embs.append(np.array(emb, dtype=np.float32))
+        train_emb = np.vstack(train_embs)  # [N,d]
+
+        # ---- Local Qwen (optional) ----
+        tokenizer = None
+        if (args.do_struct_predict or args.do_infer) and args.qwen_model_path:
+            llm = LLM(
+                model=args.qwen_model_path,
+                tensor_parallel_size=args.tensor_parallel_size,
+                gpu_memory_utilization=args.gpu_memory_utilization,
+                seed=args.seed,
+                trust_remote_code=True,
+            )
+            tokenizer = AutoTokenizer.from_pretrained(args.qwen_model_path, trust_remote_code=True)
+
+        # ---- Load queries ----
+        queries = load_json_list(args.query_file)
+
+        # -------- batch structure predict (if enabled) --------
+        if args.do_struct_predict:
+            need_idx = [i for i, q in enumerate(queries) if get_structure_type(q) is None]
+            if need_idx:
+                if llm is None:
+                    for i in need_idx:
+                        queries[i]["logical_structure"] = {"structure_type": "Other", "justification": "No local qwen configured."}
+                else:
+                    for s in tqdm(range(0, len(need_idx), args.struct_batch_size), desc="Struct batch", ncols=100):
+                        ids = need_idx[s:s + args.struct_batch_size]
+                        pts = [qtext(queries[i]) for i in ids]
+                        preds = predict_structure_batch_with_local_qwen(llm, tokenizer, pts, temperature=0.0, max_tokens=256)
+                        for i, pred in zip(ids, preds):
+                            queries[i]["logical_structure"] = pred
+        else:
+            for q in queries:
+                if get_structure_type(q) is None:
+                    q["logical_structure"] = {"structure_type": "Other", "justification": "struct predict disabled."}
+
+        # ---- Main loop: select demos + build prompts ----
+        out: List[Dict[str, Any]] = []
+        pending_prompts: List[str] = []
+        pending_out_indices: List[int] = []
+
+        for qex in tqdm(queries, desc="Selecting demos", ncols=100):
+            t_hat = get_structure_type(qex) or "Other"
+            t2 = neighbor_type(t_hat)
+
+            # ===== k==0 => zero-shot =====
+            if args.k == 0:
+                qout = dict(qex)
+                qout["icl_demos"] = []
+                qout["icl_prompt"] = build_zero_shot_prompt(qex, t_hat)
+                out.append(qout)
+
+                if args.do_infer:
+                    pending_out_indices.append(len(out) - 1)
+                    pending_prompts.append(qout["icl_prompt"])
+                continue
+
+            k = max(0, args.k)
+            k_same = int(round(k * args.same_type_ratio))
+            k_same = min(k_same, k)
+            k_nei = k - k_same
+
+            cand_same = [i for i, t in enumerate(flat_type) if t == t_hat]
+            cand_nei = [i for i, t in enumerate(flat_type) if t == t2]
+            if not cand_same:
+                cand_same = list(range(len(flat_train)))
+            if not cand_nei:
+                cand_nei = list(range(len(flat_train)))
+
+            # embed query (single; cheap enough)
+            q_emb = embedder.encode([qtext(qex)], normalize_embeddings=True, show_progress_bar=False)
+            q_emb = np.array(q_emb[0], dtype=np.float32)
+
+            sim_all = cosine_sim(q_emb, train_emb)  # [N]
+
+            def topn(idxs: List[int], n: int) -> List[int]:
+                n = min(n, len(idxs))
+                sims = sim_all[idxs]
+                order = np.argsort(-sims)[:n]
+                return [idxs[i] for i in order]
+
+            preN = max(args.preN, k * 20)
+            cand_same_top = topn(cand_same, preN)
+            cand_nei_top = topn(cand_nei, preN)
+
+            def mmr_on(cand_top: List[int], kpick: int) -> List[int]:
+                if kpick <= 0 or not cand_top:
+                    return []
+                cand_embs = train_emb[cand_top]
+                sim_q = sim_all[cand_top]
+                return mmr_select(cand_top, sim_q, cand_embs, kpick, lambda_div=args.lambda_div)
+
+            pick_same = mmr_on(cand_same_top, k_same)
+            pick_nei = mmr_on(cand_nei_top, k_nei)
+
+            picked = []
+            seen = set()
+            for idx in pick_same + pick_nei:
+                did = train_ids[idx]
+                if did in seen:
+                    continue
+                picked.append(idx)
+                seen.add(did)
+                if len(picked) >= k:
+                    break
+
+            demos = []
+            for idx in picked:
+                demos.append({
+                    "demo_id": train_ids[idx],
+                    "structure_type": flat_type[idx],
+                    "demo_text": build_demo_text(flat_train[idx]),
+                })
+
+            qout = dict(qex)
+            qout["icl_demos"] = demos
+            qout["icl_prompt"] = build_icl_prompt(demos, qex, t_hat)
+            out.append(qout)
+
+            if args.do_infer:
+                pending_out_indices.append(len(out) - 1)
+                pending_prompts.append(qout["icl_prompt"])
+
+        # ---- Batch inference ----
         if args.do_infer:
             if llm is None:
-                qout["pred_answer"] = ""
-                qout["pred_error"] = "do_infer enabled but no local qwen configured."
+                for oi in pending_out_indices:
+                    out[oi]["pred_answer"] = ""
+                    out[oi]["pred_error"] = "do_infer enabled but no local qwen configured."
             else:
-                pred = infer_answer_with_local_qwen(
-                    llm, tokenizer,
-                    qout["icl_prompt"],
-                    temperature=args.temperature,
-                    max_tokens=args.max_new_tokens
-                )
-                qout["pred_answer"] = pred
+                for s in tqdm(range(0, len(pending_prompts), args.infer_batch_size), desc="Infer batch", ncols=100):
+                    pb = pending_prompts[s:s + args.infer_batch_size]
+                    texts = vllm_generate_batch(llm, pb, temperature=args.temperature, max_tokens=args.max_new_tokens)
+                    for j, txt in enumerate(texts):
+                        oi = pending_out_indices[s + j]
+                        out[oi]["pred_answer"] = (txt or "").strip()
 
-        out.append(qout)
+        dump_json_list(args.out_file, out)
+        print(f"[OK] Wrote: {args.out_file}")
 
-    dump_json_list(args.out_file, out)
-    print(f"[OK] Wrote: {args.out_file}")
+    finally:
+        # ---- clean vLLM / torch distributed ----
+        try:
+            if llm is not None:
+                del llm
+        except Exception:
+            pass
+
+        try:
+            import torch.distributed as dist
+            if dist.is_available() and dist.is_initialized():
+                dist.destroy_process_group()
+        except Exception:
+            pass
 
 
 if __name__ == "__main__":
