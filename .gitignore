@@ -6,3 +6,4 @@ baselines/logs/
 .ipynb_checkpoints/
 
 *.pyc
+*results/
