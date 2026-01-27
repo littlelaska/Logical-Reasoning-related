@@ -1,6 +1,7 @@
 # aggregate_runs.py
 
 # 该代码用于统计多次运行的结果，计算平均值、标准差、最小值和最大值。
+# 对应的是run_batch_n.sh中N_RUNS设置的多次运行结果。
 import re, glob, os
 import numpy as np
 

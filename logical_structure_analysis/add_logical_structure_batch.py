@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# 对当前数据集分析每个样本的 CoT 逻辑结构，批量调用 SiliconFlow Batch API 完成
 
 import argparse
 import glob
