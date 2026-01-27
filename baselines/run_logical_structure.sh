@@ -7,11 +7,11 @@ OUT_DIR="../data/logical"   # 输出目录（可改）
 SPLIT="dev"                   # dev/test/train 等
 
 # 你要处理的数据集列表（按文件名前缀）
-DATASETS=("AR-LSAT")          # 例如 ("AR-LSAT" "FOLIO" "ProofWriter")
+DATASETS=("ProntoQA")          # 例如 ("AR-LSAT" "FOLIO" "ProofWriter")
 
 # DeepSeek 配置：建议用环境变量注入 key
 export DEEPSEEK_API_KEY="${DEEPSEEK_API_KEY:-sk-umzuhgrnvqjzsyagbkxnruljvrxtiqepwjejknkedamfcjsi}"
-export DEEPSEEK_MODEL="${DEEPSEEK_MODEL:-Pro/deepseek-ai/DeepSeek-R1}"
+export DEEPSEEK_MODEL="${DEEPSEEK_MODEL:-deepseek-ai/DeepSeek-V3}"
 export DEEPSEEK_BASE_URL="${DEEPSEEK_BASE_URL:-https://api.siliconflow.cn/v1}"
 
 # ======= Run =======

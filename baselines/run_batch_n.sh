@@ -10,12 +10,12 @@ BATCH_SIZE=32
 MAX_NEW_TOKENS=8192
 ZERO_SHOT=false                # 这里只跑 1–4 shot，所以不启用 zero-shot
 DTYPE="float16"
-DB_TYPE="random"              # bm25  / embedding  /  random
+DB_TYPE="bm25"              # bm25  / embedding  /  random
 EMBDEDDING_MODEL="../llms/bge-large-en-v1.5"   # text2vec-large-chinese/bge-large-en/bge-large-en-v1.5
 REVERSE_FLAG=false
 CONE_RERANK=false
 # 新增一个，重复运行n次
-N_RUNS=30
+N_RUNS=15
 
 
 # 源域（demo 来源）
@@ -142,7 +142,7 @@ for SRC in "${SOURCE_DOMAINS[@]}"; do
           echo "-------------------------------------------"
           ${LANGCHAIN_CMD}
           echo "-------------------------------------------"
-          CUDA_VISIBLE_DEVICES=1,2 ${RUN_CMD}
+          CUDA_VISIBLE_DEVICES=2,3 ${RUN_CMD}
         
           echo "================ EVAL START ================"
           echo "[CMD] ${EVA_CMD}"
