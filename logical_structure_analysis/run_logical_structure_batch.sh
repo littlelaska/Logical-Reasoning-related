@@ -8,7 +8,7 @@ OUT_DIR="../data/logical"
 SPLIT="dev"
 
 # 要处理的数据集（对应文件前缀：{DATASET}_{SPLIT}_cot.json）
-DATASETS=("ProntoQA")
+DATASETS=("LogicalDeduction")
 
 # SiliconFlow Batch 配置
 export SILICONFLOW_API_KEY="${SILICONFLOW_API_KEY:-sk-umzuhgrnvqjzsyagbkxnruljvrxtiqepwjejknkedamfcjsi}"

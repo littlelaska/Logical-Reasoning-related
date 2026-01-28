@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# 将多个结果统计到一个表格中，支持不同的预测答案key和参考答案key
+# 对应的bash脚本是run_aggregate.sh
+
 
 import argparse
 import glob

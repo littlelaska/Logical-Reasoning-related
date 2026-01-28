@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# 统计对不同 logical_structure_analysis 结果文件的准确率，可选按逻辑结构分类统计
+# 对应的启动脚本是logical_eval.sh
+
 import argparse
 import json
 import os

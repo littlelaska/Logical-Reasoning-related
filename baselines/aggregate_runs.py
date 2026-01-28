@@ -16,7 +16,7 @@ source_domians = ["ProntoQA", "AR-LSAT", "ProofWriter", "FOLIO", "gsm8k"]
 
 for source in source_domians:
     print(f"Source Domain: {source}")
-    root = f"logs/qwen14/RAG_random/{source}__LogicalDeduction"
+    root = f"logs/qwen14/RAG_embedding/{source}__LogicalDeduction"
     all_logs = sorted(glob.glob(os.path.join(root, "run*/shot*.log")))
     # print(all_logs)
     bucket = {}  # shot -> list of acc
