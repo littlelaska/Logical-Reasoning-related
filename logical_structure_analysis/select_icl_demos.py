@@ -24,6 +24,28 @@ from transformers import AutoTokenizer
 STRUCT_TYPES = ["Chain", "Y-shaped", "Block", "Other"]
 
 SYSTEM_PROMPT = "You are a logical task solver. Follow the demonstrationa to solve the new question. Remember to think step by step with concise chain-of-thought, and adhere to the context related to the question. Then on a new line, output exactly: 'The correct option is: A' or 'The correct option is: B', etc., based on your reasoning."
+SYSTEM_PROMPT_ = """You are a careful logical reasoning assistant.
+
+You may be given:
+- Some demonstration examples (for reference only)
+- A target logical reasoning problem with multiple-choice options (A, B, C, D, E)
+
+Your task:
+1) Use concise but necessary step-by-step reasoning to solve the TARGET problem.
+2) Output the final answer on a new line in the exact required format.
+
+Strict output rules:
+- If demonstrations are provided, do NOT solve them; only use them as style/format references.
+- Do NOT restate the question or options.
+- Do NOT add any extra headings, labels, or commentary.
+- The final line MUST be exactly:
+  The correct option is: <option>
+- <option> MUST be a single letter: A, B, C, D, or E
+- No extra text, spaces at the end, or punctuation after the letter.
+
+If you are unsure, still choose the best option and follow the format.
+"""
+
 
 SYSTEM_PROMPT_STRUCT = """You are an expert in logical reasoning analysis and chain-of-thought structure inspection.
 Your task is NOT to solve the problem, but to predict the reasoning STRUCTURE likely required.
@@ -44,6 +66,7 @@ Output STRICTLY in JSON:
 USER_TEMPLATE = """[Problem]
 {problem}
 """
+
 
 
 def load_json_list(path: str) -> List[Dict[str, Any]]:
@@ -74,12 +97,12 @@ def qtext(ex: Dict[str, Any]) -> str:
     parts = []
     ctx = ex.get("context")
     if isinstance(ctx, str) and ctx.strip():
-        parts.append("[Context]\n" + ctx.strip())
-    parts.append("[Question]\n" + str(ex.get("question", "")).strip())
+        parts.append("Context:\n" + ctx.strip())
+    parts.append("Question:\n" + str(ex.get("question", "")).strip())
     opts = ex.get("options")
     if isinstance(opts, list) and len(opts) > 0:
-        parts.append("[Options]\n" + "\n".join([str(o) for o in opts]))
-    return "\n\n".join(parts).strip()
+        parts.append("Options:\n" + "\n".join([str(o) for o in opts]))
+    return "\n".join(parts).strip()
 
 
 def get_structure_type(ex: Dict[str, Any]) -> Optional[str]:
@@ -100,20 +123,20 @@ def build_demo_text(ex: Dict[str, Any]) -> str:
     parts = []
     ctx = ex.get("context")
     if isinstance(ctx, str) and ctx.strip():
-        parts.append("[Context]:\n" + ctx.strip())
+        parts.append("Context:\n" + ctx.strip())
 
-    parts.append("[Question]:\n" + str(ex.get("question", "")).strip())
+    parts.append("Question:\n" + str(ex.get("question", "")).strip())
 
     opts = ex.get("options")
     if isinstance(opts, list) and len(opts) > 0:
-        parts.append("[Options]:\n" + "\n".join([str(o) for o in opts]))
+        parts.append("Options:\n" + "\n".join([str(o) for o in opts]))
     rc = ex.get("reasoning_cot")
     if isinstance(rc, str) and rc.strip():
-        parts.append("[Reasoning]:\n" + rc.strip())
+        parts.append("Reasoning:\n" + rc.strip())
 
-    ans = ex.get("answer")
-    if ans is not None:
-        parts.append("[Answer]:\n" + str(ans).strip())
+    # ans = ex.get("answer")
+    # if ans is not None:
+    #     parts.append("Answer:\n" + str(ans).strip())
     return "\n\n".join(parts).strip()
 
 
@@ -271,7 +294,7 @@ def build_chat_prompt(tokenizer, messages: List[Dict[str, str]]) -> str:
 # vLLM batch generation helpers
 # -----------------------------
 def vllm_generate_batch(llm: LLM, prompts: List[str], temperature: float, max_tokens: int) -> List[str]:
-    params = SamplingParams(temperature=temperature, max_tokens=max_tokens)
+    params = SamplingParams(temperature=temperature, max_tokens=max_tokens,top_p=1.0, top_k=1, n=1)
     outputs = llm.generate(prompts, params)
     return [o.outputs[0].text for o in outputs]
 
@@ -307,28 +330,30 @@ def predict_structure_batch_with_local_qwen(
 def build_icl_prompt(demos: List[Dict[str, Any]], query: Dict[str, Any], t_hat: str) -> str:
     demo_blocks = []
     for i, d in enumerate(demos, 1):
-        demo_blocks.append(f"### Demonstration {i}\n{d['demo_text']}")
+        # demo_blocks.append(f"### Demonstration {i}\n{d['demo_text']}")
+        demo_blocks.append(f"\n{d['demo_text']}")
 
     # q_parts = ["### Query", f"[Predicted Structure]\n{t_hat}"]
-    q_parts = ["### Query"]
+    # q_parts = ["### Query"]
+    q_parts = []
     ctx = query.get("context")
     if isinstance(ctx, str) and ctx.strip():
-        q_parts.append("[Context]:\n" + ctx.strip())
-    q_parts.append("[Question]:\n" + str(query.get("question", "")).strip())
+        q_parts.append("Context:\n" + ctx.strip())
+    q_parts.append("Question:\n" + str(query.get("question", "")).strip())
     opts = query.get("options")
     if isinstance(opts, list) and len(opts) > 0:
-        q_parts.append("[Options]:\n" + "\n".join([str(o) for o in opts]))
-    q_parts.append("[Reasoning]:\n")
-    q_parts.append("[Answer]:\n")
+        q_parts.append("Options:\n" + "\n".join([str(o) for o in opts]))
+    q_parts.append("Reasoning:\n")
+    # q_parts.append("[Answer]:\n")
 
     return (
         # "You will be given demonstrations that share a similar reasoning structure. "
-        "You will be given several demonstrations to learn from. "
+        "Given a problem statement as contexts, the task is to answer a logical reasoning question.\n"
         # "Follow the structure to solve the query.\n\n"
-        "Solve the following problem carefully."
-        + "\n\n".join(demo_blocks)
-        + "\n\n"
-        + "\n\n".join(q_parts)
+        "------"
+        + "\n".join(demo_blocks)
+        + "------\n"
+        + "\n".join(q_parts)
     )
 
 
@@ -337,14 +362,17 @@ def build_zero_shot_prompt(query: Dict[str, Any], t_hat: str) -> str:
     q_parts = [] 
     ctx = query.get("context")
     if isinstance(ctx, str) and ctx.strip():
-        q_parts.append("[Context]:\n" + ctx.strip())
-    q_parts.append("[Question]:\n" + str(query.get("question", "")).strip())
+        q_parts.append("Context:\n" + ctx.strip())
+    q_parts.append("Question:\n" + str(query.get("question", "")).strip())
     opts = query.get("options")
     if isinstance(opts, list) and len(opts) > 0:
-        q_parts.append("[Options]:\n" + "\n".join([str(o) for o in opts]))
+        q_parts.append("Options:\n" + "\n".join([str(o) for o in opts]))
     # q_parts.append("[Reasoning]\n")
     # q_parts.append("[Answer]\n")
-    q_parts.append("Let's think step by step. The correct option is :")
+    # q_parts.append("Let's think step by step. The correct option is :")
+    q_parts.append("Reasoning:")
+    return "Given a problem statement as contexts, the task is to answer a logical reasoning question.\n------\n\n------\n" + "\n".join(q_parts)
+    return "Given a problem statement as contexts, the task is to answer a logical reasoning question.\n------\n[[DEMONSTRATIONS]]\n------\n" + "\n".join(q_parts)
     return "Solve the following problem carefully.\n\n" + "\n\n".join(q_parts)
 
 
@@ -367,6 +395,15 @@ def wrong_cot_filter(answer, cot):
             if cot_answer == answer:
                 keep_flag = True
     return keep_flag
+
+# 新增一个抽取结果的部分
+def update_answer(output):
+    pat = re.compile(r'(?i)\bthe\s+correct\s+(?:answer|option)\s+is\s*:?[\s\n]*([A-F])\b')
+    m = pat.findall(output)
+    choice = m[-1] if m else None
+    # print(choice)
+    return choice
+
 
 def main():
     ap = argparse.ArgumentParser()
@@ -487,15 +524,19 @@ def main():
         if (args.do_struct_predict or args.do_infer) and args.qwen_model_path:
             llm = LLM(
                 model=args.qwen_model_path,
+                tokenizer=args.qwen_model_path,
+                max_model_len=32768,
+                dtype="float16",
                 tensor_parallel_size=args.tensor_parallel_size,
                 gpu_memory_utilization=args.gpu_memory_utilization,
-                seed=args.seed,
+                # seed=args.seed,
                 trust_remote_code=True,
             )
             tokenizer = AutoTokenizer.from_pretrained(args.qwen_model_path, trust_remote_code=True)
 
         # ---- Load queries ----
         queries = load_json_list(args.query_file)
+        # queries = load_json_list(args.query_file)[:10]
 
         # -------- batch structure predict (if enabled) --------
         if args.do_struct_predict and args.demo_method == "logical":
@@ -661,11 +702,13 @@ def main():
                     # print("\n\n")
                     # print(pending_messages[s])
                     # exit()
-                    # pb = pending_messages[s:s + args.infer_batch_size]
+                    pb = pending_messages[s:s + args.infer_batch_size]
                     texts = vllm_generate_batch(llm, pb, temperature=args.temperature, max_tokens=args.max_new_tokens)
                     for j, txt in enumerate(texts):
                         oi = pending_out_indices[s + j]
                         out[oi]["pred_answer"] = (txt or "").strip()
+                        answer_split = update_answer(out[oi]["pred_answer"])
+                        out[oi]["predicted_answer"] = answer_split
 
         dump_json_list(args.out_file, out)
         print(f"[OK] Wrote: {args.out_file}")

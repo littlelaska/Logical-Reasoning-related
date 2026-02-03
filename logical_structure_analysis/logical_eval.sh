@@ -3,11 +3,13 @@
 set -euo pipefail
 
 SOURCE_DOMAINS=("AR-LSAT" "ProofWriter" "FOLIO" "gsm8k" "ProntoQA")
+# SOURCE_DOMAINS=("AR-LSAT")
 TARGET_DOMAINS=("LogicalDeduction")
 
 # ✅ 可选 K 序列
 K_LIST=(0 1 2 4 6 8)
-DEMO_METHOD="bm25"   # logical | embed | bm25 | random
+K_LIST=(0)
+DEMO_METHOD="embed"   # logical | embed | bm25 | random
 OUT_ROOT="${DEMO_METHOD}_results"
 
 for K in "${K_LIST[@]}"; do

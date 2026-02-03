@@ -7,3 +7,4 @@ baselines/logs/
 
 *.pyc
 *results/
+*results_bak/

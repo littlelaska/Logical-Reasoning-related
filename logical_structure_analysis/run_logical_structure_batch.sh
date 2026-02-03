@@ -5,10 +5,11 @@ set -e
 # ======= You edit here =======
 ROOT_DATA_DIR="../data"
 OUT_DIR="../data/logical"
-SPLIT="dev"
+SPLIT="train"
 
 # 要处理的数据集（对应文件前缀：{DATASET}_{SPLIT}_cot.json）
-DATASETS=("LogicalDeduction")
+DATASETS=("AR-LSAT")
+TASK="cot"   # cot/struct 分别对应生成cot或者分析cot的逻辑结构
 
 # SiliconFlow Batch 配置
 export SILICONFLOW_API_KEY="${SILICONFLOW_API_KEY:-sk-umzuhgrnvqjzsyagbkxnruljvrxtiqepwjejknkedamfcjsi}"
@@ -31,7 +32,12 @@ for DS in "${DATASETS[@]}"; do
 
   python3 add_logical_structure_batch.py \
     --inputs "${IN_FILE}" \
+    --input_dir "${DATA_DIR}" \
     --output_dir "${OUT_DIR}" \
+    --task "${TASK}" \
+    --split "${SPLIT}" \
+    --api_key "${SILICONFLOW_API_KEY}" \
+    --model "${SILICONFLOW_MODEL}" \
     --skip_existing \
     --batch_size "${BATCH_SIZE}" \
     --poll_interval "${POLL_INTERVAL}" \

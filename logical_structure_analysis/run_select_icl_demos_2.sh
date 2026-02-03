@@ -6,22 +6,24 @@ set -euo pipefail
 # =========================
 GPU_IDS="3"
 export CUDA_VISIBLE_DEVICES="${GPU_IDS}"
+
 IFS=',' read -ra GPU_ARRAY <<< "${GPU_IDS}"
 TP="${#GPU_ARRAY[@]}"
+
 # =========================
 # Paths (edit here)
 # =========================
 TRAIN_ROOT="../data/logical"
 QUERY_ROOT="../data"
 
-DEMO_METHOD="embed"   # logical | embed | bm25 | random
+DEMO_METHOD="logical"   # logical | embed | bm25 | random
 OUT_ROOT="${DEMO_METHOD}_results"
 
 # =========================
 # Domains (edit here)
 # =========================
 SOURCE_DOMAINS=("AR-LSAT" "ProofWriter" "FOLIO" "gsm8k" "ProntoQA")
-# SOURCE_DOMAINS=("gsm8k" "ProntoQA")
+# SOURCE_DOMAINS=("AR-LSAT")
 TARGET_DOMAINS=("LogicalDeduction")
 
 # ==============================
@@ -51,8 +53,8 @@ get_split_by_source() {
 # =========================
 # Demo selection params
 # =========================
-K_LIST=(1 2 4 6 8 16)
-# K_LIST=(1)
+K_LIST=(0 1 2 4 6 8 16)
+# K_LIST=(0)
 
 
 SAME_TYPE_RATIO=0.75
@@ -73,7 +75,7 @@ GPU_UTIL=0.92
 
 # generation params
 TEMP=0.0
-MAX_NEW_TOKENS=8192
+MAX_NEW_TOKENS=2048
 
 # =========================
 # NEW: Batch sizes for vLLM

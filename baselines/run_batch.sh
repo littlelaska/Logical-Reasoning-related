@@ -17,12 +17,14 @@ CONE_RERANK=false
 
 # 源域（demo 来源）
 SOURCE_DOMAINS=("gsm8k" "ProntoQA" "AR-LSAT" "ProofWriter" "FOLIO" "LogicalDeduction")    # "gsm8k" "ProntoQA" "AR-LSAT" "ProofWriter" "FOLIO" "LogicalDeduction"
+# SOURCE_DOMAINS=("AR-LSAT")    # "gsm8k" "ProntoQA" "AR-LSAT" "ProofWriter" "FOLIO" "LogicalDeduction"
  
 # 目标域（评测数据集）
 TARGET_DOMAINS=("LogicalDeduction")
 
 # shots: 1, 2, 3, 4
 SHOTS=(0 1 2 3 4 8 16)
+# SHOTS=(1)
 
 
 # ==============================
@@ -136,7 +138,7 @@ for SRC in "${SOURCE_DOMAINS[@]}"; do
         echo "-------------------------------------------"
         ${LANGCHAIN_CMD}
         echo "-------------------------------------------"
-        CUDA_VISIBLE_DEVICES=1,2 ${RUN_CMD}
+        CUDA_VISIBLE_DEVICES=3 ${RUN_CMD}
         
         echo "================ EVAL START ================"
         echo "[CMD] ${EVA_CMD}"

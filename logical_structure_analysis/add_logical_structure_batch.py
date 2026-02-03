@@ -71,6 +71,33 @@ OUTPUT FORMAT (STRICT JSON)
 """
 
 
+COT_SYSTEM_PROMPT = """You are a careful logical reasoning assistant.
+
+You must solve the problem by reasoning step by step internally and briefly.
+Your reasoning should be concise and include only the necessary steps.
+
+Output rules:
+1. First, provide a short and necessary chain-of-thought.
+   - Do not include redundant explanations.
+   - Do not restate the question.
+2. Then, output the final answer on a new line.
+
+The final answer line MUST:
+- Start exactly with: "The correct option is:"
+- Be followed by ONLY a single option letter (A, B, C, or D)
+- Contain no extra text, symbols, or punctuation
+
+Any deviation from the format is invalid.
+
+"""
+
+COT_USER_PROMPT_TEMPLATE = """Please produce a concise step-by-step chain-of-thought reasoning and final option for the following problem.
+
+{problem}
+
+Reasoning:
+"""
+
 # --------------------------
 # Utils
 # --------------------------
@@ -151,7 +178,6 @@ def extract_json_from_text(text: str) -> Optional[Dict[str, Any]]:
 def chunk_list(xs: List[Any], n: int) -> List[List[Any]]:
     return [xs[i:i+n] for i in range(0, len(xs), n)]
 
-
 # --------------------------
 # SiliconFlow Batch API (OpenAI-compatible)
 # --------------------------
@@ -177,8 +203,6 @@ def sf_upload_file(client: OpenAI, jsonl_path: str) -> str:
     print("the file id is:", file_id)
 
     return file_id
-
-
 
 def sf_create_batch(
     client: OpenAI,
@@ -211,13 +235,10 @@ def sf_create_batch(
 
     return batch_job_id
 
-
-
 def sf_get_batch(client, batch_id: str) -> Dict[str, Any]:
     batch_job = client.batches.retrieve(batch_id)
     
     return batch_job
-
 
 def sf_download_file_content(file_id: str) -> str:
     """
@@ -229,7 +250,6 @@ def sf_download_file_content(file_id: str) -> str:
     r.raise_for_status()
     # content is jsonl text
     return r.text
-
 
 # --------------------------
 # Build batch jsonl & parse output
@@ -323,7 +343,6 @@ def parse_batch_output_jsonl(output_text: str) -> Dict[str, Dict[str, Any]]:
             # error case
             out[cid] = {"ok": False, "error": obj.get("error"), "raw": obj}
     return out
-
 
 def classify_with_batch_and_apply(
     base_url_v1: str,
@@ -443,10 +462,161 @@ def classify_with_batch_and_apply(
                     "justification": f"Batch error: {rec.get('error')}",
                 }
 
+def build_cot_batch_jsonl_lines(
+    data: List[Dict[str, Any]],
+    start_idx: int,
+    end_idx: int,
+    custom_id_prefix: str,
+    model_in_body: str,
+    skip_existing: bool,
+) -> Tuple[List[str], Dict[str, int]]:
+    """
+    returns:
+      lines: jsonl lines
+      custom_id -> global index in `data`
+    """
+    lines: List[str] = []
+    cid2idx: Dict[str, int] = {}
+
+    for i in range(start_idx, end_idx):
+        ex = data[i]
+        if skip_existing and isinstance(ex.get("reasoning_cot"), str) and ex["reasoning_cot"].strip():
+            continue
+
+        problem_text = build_problem_text(ex)
+        if not problem_text.strip():
+            ex["reasoning_cot"] = ""
+            continue
+
+        user_prompt = COT_USER_PROMPT_TEMPLATE.format(problem=problem_text)
+        messages = [
+            {"role": "system", "content": COT_SYSTEM_PROMPT},
+            {"role": "user", "content": user_prompt},
+        ]
+
+        custom_id = f"{custom_id_prefix}-{i}"
+        cid2idx[custom_id] = i
+
+        line_obj = {
+            "custom_id": custom_id,
+            "method": "POST",
+            "url": "/v1/chat/completions",
+            "body": {
+                "model": model_in_body,   # 占位；真实模型由 extra_body.replace.model 控制
+                "messages": messages,
+                "temperature": 0.2,
+                "max_tokens": 1024,
+                "stream": False,
+            },
+        }
+        lines.append(json.dumps(line_obj, ensure_ascii=False))
+
+    return lines, cid2idx
+
+
+def generate_cot_with_batch_and_apply(
+    base_url_v1: str,
+    api_key: str,
+    model: str,
+    data: List[Dict[str, Any]],
+    in_file_tag: str,
+    batch_size: int = 4500,
+    completion_window: str = "24h",
+    poll_interval_sec: int = 30,
+    skip_existing: bool = True,
+    workdir: str = ".",
+) -> None:
+    """
+    Split into multiple batch jobs if needed, generate reasoning_cot and apply back to data.
+    """
+    os.makedirs(workdir, exist_ok=True)
+
+    n = len(data)
+    ranges = [(i, min(i + batch_size, n)) for i in range(0, n, batch_size)]
+
+    for b, (s, e) in enumerate(ranges):
+        prefix = f"{in_file_tag}-b{b}"
+        jsonl_path = os.path.join(workdir, f"batch_input_cot_{prefix}.jsonl")
+
+        lines, cid2idx = build_cot_batch_jsonl_lines(
+            data=data,
+            start_idx=s,
+            end_idx=e,
+            custom_id_prefix=prefix,
+            model_in_body=model,
+            skip_existing=skip_existing,
+        )
+
+        if not lines:
+            continue
+
+        with open(jsonl_path, "w", encoding="utf-8") as f:
+            for ln in lines:
+                f.write(ln + "\n")
+
+        client = OpenAI(api_key=api_key, base_url=base_url_v1)
+
+        # 1) upload
+        input_file_id = sf_upload_file(client, jsonl_path)
+        print(f"[COT BATCH] uploaded input_file_id={input_file_id} for {prefix}")
+
+        # 2) create batch
+        batch_id = sf_create_batch(
+            client=client,
+            input_file_id=input_file_id,
+            model=model,
+            completion_window=completion_window,
+            metadata={"description": f"cot generation: {prefix}"},
+        )
+        print(f"[COT BATCH] created batch_id={batch_id} for {prefix}")
+
+        # 3) poll
+        while True:
+            batch_job = sf_get_batch(client, batch_id)
+            job_status = batch_job.status
+            print(f"[COT BATCH] {batch_id} status={job_status}")
+            if job_status in {"completed", "failed", "expired", "cancelled"}:
+                break
+            time.sleep(poll_interval_sec)
+
+        # 4) download outputs
+        batch_job = sf_get_batch(client, batch_id)
+        out_file_id = batch_job.output_file_id
+        err_file_id = batch_job.error_file_id
+
+        out_map: Dict[str, Dict[str, Any]] = {}
+        err_map: Dict[str, Dict[str, Any]] = {}
+
+        if out_file_id:
+            out_text = sf_download_file_content(out_file_id)
+            out_map = parse_batch_output_jsonl(out_text)
+
+        if err_file_id:
+            err_text = sf_download_file_content(err_file_id)
+            err_map = parse_batch_output_jsonl(err_text)
+
+        merged = {**out_map, **err_map}
+
+        # 5) apply back to data
+        for cid, idx in cid2idx.items():
+            rec = merged.get(cid)
+            if not rec:
+                data[idx]["reasoning_cot"] = ""
+                continue
+
+            if rec.get("ok") is True:
+                cot_text = (rec.get("content") or "").strip()
+                data[idx]["reasoning_cot"] = cot_text
+            else:
+                data[idx]["reasoning_cot"] = ""
+                data[idx]["cot_error"] = f"Batch error: {rec.get('error')}"
+
+
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--inputs", nargs="+", required=True, help="Files/dirs/globs, e.g. data/*_cot.json")
+    ap.add_argument("--input_dir", default="", help="input data file dir")
     ap.add_argument("--output_dir", default="", help="Write outputs into this dir with derived names.")
     ap.add_argument("--api_key", default=os.environ.get("SILICONFLOW_API_KEY", ""))
     ap.add_argument("--base_url_v1", default=os.environ.get("SILICONFLOW_BASE_URL_V1", "https://api.siliconflow.cn/v1"))
@@ -456,40 +626,95 @@ def main():
     ap.add_argument("--poll_interval", type=int, default=30)
     ap.add_argument("--skip_existing", action="store_true")
     ap.add_argument("--workdir", default="./batch_tmp", help="Where to write intermediate jsonl files.")
+    ap.add_argument("--task", default="structure", help="Task name for logging purposes.")   # 可选值：structure 或者生成cot
+    ap.add_argument("--split", default="train", help="Data split name, e.g. dev/train/test (for output file naming when generating CoT).")
     args = ap.parse_args()
 
     if not args.api_key:
         raise SystemExit("Missing API key. Set --api_key or env SILICONFLOW_API_KEY.")
-
-    in_files = collect_input_files(args.inputs)
+    
+    if args.task not in {"structure", "cot"}:
+        raise SystemExit("Invalid task. Must be 'structure' or 'cot'.")
+    if args.task == "structure":
+        in_files = collect_input_files(args.inputs)
+    else:
+        in_files = [files for files in os.listdir(args.input_dir) if files.endswith(f"{args.split}.json")]
+        # print(in_files)
     if not in_files:
         raise SystemExit("No input files found.")
+    if args.task == "cot":
 
-    for in_path in in_files:
-        data = safe_json_load(in_path)
+        # ===== task == "cot": 从 input_dir 找 split.json，生成 reasoning_cot，输出到同路径的 *_cot.json =====
+        if not args.input_dir:
+            raise SystemExit("Missing --input_dir for --task cot.")
+        if not os.path.isdir(args.input_dir):
+            raise SystemExit(f"--input_dir not found: {args.input_dir}")
 
-        out_path = derive_output_path(in_path)
-        if args.output_dir:
-            os.makedirs(args.output_dir, exist_ok=True)
-            out_path = os.path.join(args.output_dir, os.path.basename(out_path))
+        in_files = [
+            os.path.join(args.input_dir, fn)
+            for fn in sorted(os.listdir(args.input_dir))
+            if fn.endswith(f"_{args.split}.json") or fn.endswith(f"{args.split}.json")
+        ]
 
-        tag = os.path.splitext(os.path.basename(in_path))[0]
+        if not in_files:
+            raise SystemExit(f"No input files found in {args.input_dir} for split={args.split}.")
 
-        classify_with_batch_and_apply(
-            base_url_v1=args.base_url_v1,
-            api_key=args.api_key,
-            model=args.model,
-            data=data,
-            in_file_tag=tag,
-            batch_size=args.batch_size,
-            completion_window=args.completion_window,
-            poll_interval_sec=args.poll_interval,
-            skip_existing=args.skip_existing,
-            workdir=args.workdir,
-        )
+        for in_path in in_files:
+            data = safe_json_load(in_path)
 
-        safe_json_dump(out_path, data)
-        print(f"[OK] Wrote: {out_path}")
+            # 输出同目录：xxx.json -> xxx_cot.json（满足“当前数据集_split_cot.json”）
+            input_dir = args.input_dir
+            dataset = input_dir.split("/")[-1]
+            datasplit = args.split
+            base, ext = os.path.splitext(in_path)
+            output_file = f"{dataset}_{datasplit}_cot.json"
+            out_path = os.path.join(os.path.dirname(in_path), output_file)
+            # out_path = base + "_cot.json"
+            
+            tag = os.path.splitext(os.path.basename(in_path))[0]
+            
+            
+            generate_cot_with_batch_and_apply(
+                base_url_v1=args.base_url_v1,
+                api_key=args.api_key,
+                model=args.model,
+                data=data,
+                in_file_tag=tag,
+                batch_size=args.batch_size,
+                completion_window=args.completion_window,
+                poll_interval_sec=args.poll_interval,
+                skip_existing=args.skip_existing,
+                workdir=args.workdir,
+            )
+
+            safe_json_dump(out_path, data)
+            print(f"[OK] Wrote: {out_path}")
+    else:
+        for in_path in in_files:
+            data = safe_json_load(in_path)
+
+            out_path = derive_output_path(in_path)
+            if args.output_dir:
+                os.makedirs(args.output_dir, exist_ok=True)
+                out_path = os.path.join(args.output_dir, os.path.basename(out_path))
+
+            tag = os.path.splitext(os.path.basename(in_path))[0]
+
+            classify_with_batch_and_apply(
+                base_url_v1=args.base_url_v1,
+                api_key=args.api_key,
+                model=args.model,
+                data=data,
+                in_file_tag=tag,
+                batch_size=args.batch_size,
+                completion_window=args.completion_window,
+                poll_interval_sec=args.poll_interval,
+                skip_existing=args.skip_existing,
+                workdir=args.workdir,
+            )
+
+            safe_json_dump(out_path, data)
+            print(f"[OK] Wrote: {out_path}")
 
 
 if __name__ == "__main__":

@@ -122,7 +122,6 @@ def evaluate_QA(result_file):
     print(f"EM: {avg_em}")
     print(f"wrong samples are {len(wrong_ids)}, ids are:\n", wrong_ids)
 
-
 def evaluate_gsm8k_exact(
     json_path: str,
     answer_key: str = "answer",
