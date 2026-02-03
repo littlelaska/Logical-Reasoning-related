@@ -5,7 +5,7 @@ set -e
 # ======= You edit here =======
 ROOT_DATA_DIR="../data"
 OUT_DIR="../data/logical"
-SPLIT="train"
+SPLIT="dev"
 
 # 要处理的数据集（对应文件前缀：{DATASET}_{SPLIT}_cot.json）
 DATASETS=("AR-LSAT")

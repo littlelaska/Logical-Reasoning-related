@@ -51,7 +51,7 @@ get_split_by_source() {
 # =========================
 # Demo selection params
 # =========================
-K_LIST=(1 2 4 6 8 16)
+K_LIST=(0 1 2 4 6 8 16)
 # K_LIST=(1)
 
 

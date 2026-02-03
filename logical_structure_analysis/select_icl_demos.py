@@ -398,7 +398,7 @@ def wrong_cot_filter(answer, cot):
 
 # 新增一个抽取结果的部分
 def update_answer(output):
-    pat = re.compile(r'(?i)\bthe\s+correct\s+(?:answer|option)\s+is\s*:?[\s\n]*([A-F])\b')
+    pat = re.compile(r'(?i)\bthe\s+correct\s+(?:answer|option)\s+is\s*:?[\s\n]*([A-H])\b')
     m = pat.findall(output)
     choice = m[-1] if m else None
     # print(choice)

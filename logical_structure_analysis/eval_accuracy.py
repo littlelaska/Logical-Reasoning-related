@@ -156,10 +156,12 @@ def evaluate_QA(result_file, args):
             by_struct[struct][1] += 1
             if prediction == gold_answer:
                 by_struct[struct][0] += 1
+        
         em_score = 1.0 if prediction == gold_answer else 0.0
         total_em += em_score
         count += 1
         if em_score != 1.0:
+            # print(sample_index, f"prediction: {prediction} \t gold_answers: {gold_answer}")
             wrong_ids.append(sample_index)
         sample_index += 1
     
