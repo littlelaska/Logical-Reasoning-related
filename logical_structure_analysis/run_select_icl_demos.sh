@@ -4,7 +4,7 @@ set -euo pipefail
 # =========================
 # GPU selection
 # =========================
-GPU_IDS="3"
+GPU_IDS="2"
 export CUDA_VISIBLE_DEVICES="${GPU_IDS}"
 IFS=',' read -ra GPU_ARRAY <<< "${GPU_IDS}"
 TP="${#GPU_ARRAY[@]}"
@@ -52,7 +52,7 @@ get_split_by_source() {
 # Demo selection params
 # =========================
 K_LIST=(0 1 2 4 6 8 16)
-# K_LIST=(1)
+K_LIST=(0)
 
 
 SAME_TYPE_RATIO=0.75
@@ -64,6 +64,9 @@ PREN=200   # number of candidates to consider before selection
 # =========================
 BGE_PATH="../llms/bge-large-en-v1.5"
 QWEN_PATH="../llms/Qwen2.5-14B-Instruct"
+QWEN_PATH="/data_a100/models/Qwen2.5-32B-Instruct"
+MODEL_SIZE="$(echo "$QWEN_PATH" | sed -n 's/.*-\([0-9]\+\(\.[0-9]\+\)\?[Bb]\+\)-.*/\1/p')"
+echo "$MODEL_SIZE"
 
 DO_STRUCT_PREDICT=1   # whether to do structure prediction
 DO_INFER=1            # whether to do final inference after demo selection
