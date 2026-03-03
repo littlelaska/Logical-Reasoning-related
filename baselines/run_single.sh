@@ -1,13 +1,13 @@
 MODE="RAG"    # CoT/Direct/RAG/Logical
 DATASET_NAME="LogicalDeduction"    # gsm8k/ProntoQA/AR-LSAT/FOLIO/ProofWriter/LogicalDeduction
-MODEL_NAME="qwen7"   # qwen14/qwen7/qwen3-8
+MODEL_NAME="gemma3-12"   # qwen14/qwen7/qwen3-8
 SPLIT="dev"
-LANGCHAIN_DB="gsm8k"    # gsm8k//ProntoQA/FOLIO/ProofWriter/LogicalDeduction
-DB_TYPE="bm25"   # bm25/embedding/random
+LANGCHAIN_DB="commonsense"    # gsm8k//ProntoQA/FOLIO/ProofWriter/LogicalDeduction/commonsense
+DB_TYPE="embedding"   # bm25/embedding/random
 RAG_TOPK=10
-DEMONSTRATION_NUM=0
+DEMONSTRATION_NUM=1
 ZERO_SHOT=true
-DTYPE="float16"
+DTYPE="bfloat16"
 REVERSE_FLAG=false
 EMBDEDDING_MODEL="../llms/bge-large-en-v1.5"   # text2vec-large-chinese/bge-large-en/bge-large-en-v1.5
 CONE_RERANK=false
@@ -38,7 +38,7 @@ fi
 # $LANGCHAIN_CMD
 
 echo "Running: $RUN_CMD"
-CUDA_VISIBLE_DEVICES=0,1,2,3 $RUN_CMD
+CUDA_VISIBLE_DEVICES=1,6 $RUN_CMD
 
 echo "Running: $EVA_CMD"
 $EVA_CMD

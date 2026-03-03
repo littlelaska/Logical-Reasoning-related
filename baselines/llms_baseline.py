@@ -71,6 +71,12 @@ class LLM_Reasoning_Graph_Baseline:
             self.model_path = "../llms/Qwen3-32B"
         elif self.model_name == "llama3-8":
             self.model_path = "../llms/llama3.1-8B-Instruct"
+        elif self.model_name == "gemma3-4":
+            self.model_path = "/data_a100/models/gemma-3-4b-it"
+        elif self.model_name == "gemma3-12":
+            self.model_path = "/data_a100/models/gemma-3-12b-it"
+        elif self.model_name == "gemma3-27":
+            self.model_path = "/data_a100/models/gemma-3-27b-it"
         else:
             self.model_path = "../llms/"
         
@@ -585,7 +591,7 @@ class LLM_Reasoning_Graph_Baseline:
         if self.vllm_switch:
             # vllm的调用，与model generate不同，不需要进行tokenizer的encode
             outputs = self.model.generate(texts, sampling_params=self.sampling_params)
-            # print(outputs)
+            print(outputs)
             responses = [output.outputs[0].text for output in outputs]
             # print(responses)
                 

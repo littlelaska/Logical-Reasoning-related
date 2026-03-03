@@ -4,26 +4,26 @@
 # 固定配置（按需改）
 # ==============================
 MODE="RAG"                     # CoT / Direct / RAG / Logical
-MODEL_NAME="qwen14"            # 给定模型
+MODEL_NAME="gemma3-27"            # 给定模型
 RAG_TOPK=30
-BATCH_SIZE=64
+BATCH_SIZE=32
 MAX_NEW_TOKENS=8192
 ZERO_SHOT=false                # 这里只跑 1–4 shot，所以不启用 zero-shot
-DTYPE="float16"
-DB_TYPE="random"              # bm25  / embedding  /  random
+DTYPE="bfloat16"
+DB_TYPE="embedding"              # bm25  / embedding  /  random
 EMBDEDDING_MODEL="../llms/bge-large-en-v1.5"   # text2vec-large-chinese/bge-large-en/bge-large-en-v1.5
 REVERSE_FLAG=false
 CONE_RERANK=false
 
 # 源域（demo 来源）
 SOURCE_DOMAINS=("gsm8k" "ProntoQA" "AR-LSAT" "ProofWriter" "FOLIO" "LogicalDeduction")    # "gsm8k" "ProntoQA" "AR-LSAT" "ProofWriter" "FOLIO" "LogicalDeduction"
-# SOURCE_DOMAINS=("AR-LSAT")    # "gsm8k" "ProntoQA" "AR-LSAT" "ProofWriter" "FOLIO" "LogicalDeduction"
+SOURCE_DOMAINS=("commonsense")    # "gsm8k" "ProntoQA" "AR-LSAT" "ProofWriter" "FOLIO" "LogicalDeduction"
  
 # 目标域（评测数据集）
-TARGET_DOMAINS=("LogicalDeduction")
+TARGET_DOMAINS=("FOLIO")
 
 # shots: 1, 2, 3, 4
-SHOTS=(0 1 2 3 4 8 16)
+SHOTS=(0 1 2 4 8)
 # SHOTS=(1)
 
 
@@ -136,9 +136,9 @@ for SRC in "${SOURCE_DOMAINS[@]}"; do
         echo "[CMD] ${LANGCHAIN_CMD}"
         echo "[CMD] ${RUN_CMD}"
         echo "-------------------------------------------"
-        ${LANGCHAIN_CMD}
+        # ${LANGCHAIN_CMD}
         echo "-------------------------------------------"
-        CUDA_VISIBLE_DEVICES=3 ${RUN_CMD}
+        CUDA_VISIBLE_DEVICES=1,3 ${RUN_CMD}
         
         echo "================ EVAL START ================"
         echo "[CMD] ${EVA_CMD}"

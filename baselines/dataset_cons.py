@@ -150,7 +150,7 @@ class DatasetCons:
         if self.db_type == "random":
             print("the random retrieve mode dont need to build a faiss db")
             return 
-        if self.dataset_name not in ["ProntoQA","AR-LSAT","ProofWriter", "LogicalDeduction","FOLIO", "gsm8k"]:
+        if self.dataset_name not in ["ProntoQA","AR-LSAT","ProofWriter", "LogicalDeduction","FOLIO", "gsm8k", "commonsense"]:
             print(f"the wrong dataset {self.dataset_name} were provided. Ended the program!")
             return
         # 加载调用deepseek端口的cot
@@ -158,6 +158,9 @@ class DatasetCons:
             load_fn = self.logical_task_common_cot_load_data
         elif self.dataset_name in ["gsm8k", "ProntoQA"]:
             load_fn = getattr(self, f"{self.dataset_name}_load_data")
+        # commonsenseQA利用gsm8k的接口
+        elif self.dataset_name == "commonsense":
+            load_fn = self.gsm8k_load_data
         else:
             raise ValueError(f"Unknown dataset:{self.dataset_name}, unrecognized load type:{self.ds_cot}")
 #         try:
@@ -236,7 +239,7 @@ class DatasetRetriever:
             # print("-------------------")
             page_content = doc.page_content
             metadata = doc.metadata
-            if self.db_name == "gsm8k":
+            if self.db_name in ["gsm8k","commonsense"]:
                 context = ""
                 question = page_content
                 answer = metadata.get("answer", "")
