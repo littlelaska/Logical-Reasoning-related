@@ -60,7 +60,8 @@ class LLM_Reasoning_Graph_Baseline:
     def para_init(self):
         # 模型路径初始化
         if self.model_name == "qwen7":
-            self.model_path = "../llms/Qwen2.5-7B-Instruct"
+            # self.model_path = "../llms/Qwen2.5-7B-Instruct"
+            self.model_path = "/data_a100/models/Qwen2.5-7B-Instruct"
         elif self.model_name == "qwen14":
             self.model_path = "../llms/Qwen2.5-14B-Instruct"
         elif self.model_name == "qwen3-8":
@@ -107,9 +108,12 @@ class LLM_Reasoning_Graph_Baseline:
             self.prompt_file = f"{self.dataset_name}_{self.mode}{'_0shot' if self.zero_shot else ''}.txt"
         else:
             self.prompt_file = f"LogicalReasoning_{self.mode}{'_0shot' if self.zero_shot else ''}.txt"
+            # 2026.3.16 prompt中context是否后置的逻辑
+            if self.args.repeat_reverse:
+                self.prompt_file = f"LogicalReasoning_RAG_reverse.txt"
         self.system_prompt_path = os.path.join(self.system_prompt_dir, self.prompt_file)
         print(f"system prompt file path: {self.system_prompt_path}")
-        
+
         # user prompt路径初始化
         self.user_prompt_path = os.path.join(self.user_template_dir, self.prompt_file)
         print(f"user prompt file path: {self.user_prompt_path}")
@@ -136,11 +140,16 @@ class LLM_Reasoning_Graph_Baseline:
         else:
             self.save_file = os.path.join(self.save_path, f'{self.mode}_{self.testing_type}_{self.dataset_name}_{self.split}_{self.model_name}.json')
         
+        # 2026.3.13 proppmpt复制部分
+        self.repeat_time = self.args.repeat_time
+        
+        
         # 打印部分参数
         print("="*16+"parameteres"+"="*16)
     
         self.print_self()
         print("="*16+"parameteres"+"="*16)
+
     # 打印参数
     def print_self(self):
         for k,v in self.__dict__.items():
@@ -170,7 +179,7 @@ class LLM_Reasoning_Graph_Baseline:
         if self.vllm_switch:
             print("使用vllm进行模型加载和推理")
             print("loading model from:", self.model_path)
-            model = LLM(model=self.model_path, tokenizer=self.model_path,tensor_parallel_size=torch.cuda.device_count(), max_model_len=32768,dtype=self.dtype, trust_remote_code=True, gpu_memory_utilization=0.9)
+            model = LLM(model=self.model_path, tokenizer=self.model_path,tensor_parallel_size=torch.cuda.device_count(), max_model_len=32768,dtype=self.dtype, trust_remote_code=True, gpu_memory_utilization=0.8)
             tokenizer = AutoTokenizer.from_pretrained(self.model_path, padding_side='left')
 #             self.sampling_params = SamplingParams(temperature=0, max_tokens=self.max_new_tokens, top_p=0.95, top_k=40, n=1)
             self.sampling_params = SamplingParams(
@@ -471,6 +480,9 @@ class LLM_Reasoning_Graph_Baseline:
         # 针对gsm8k的处理逻辑不一样
         if self.dataset_name == "gsm8k":
             question = test_example['question'].strip()
+            # 2026.3.13 对question进行重复
+            question_list = [question,] * self.repeat_time
+            question = "\n".join(question_list)
             full_prompt = full_prompt.replace('[[QUESTION]]', question)
         else:
             context = test_example['context'].strip()
@@ -479,6 +491,20 @@ class LLM_Reasoning_Graph_Baseline:
             full_prompt = full_prompt.replace('[[CONTEXT]]', context)
             full_prompt = full_prompt.replace('[[QUESTION]]', question)
             full_prompt = full_prompt.replace('[[OPTIONS]]', options)
+            # 2026.3.14 对question进行重复
+            if self.repeat_time >1:
+                # print("进入repeat")
+                split_parts = full_prompt.split("------")
+                all_context = split_parts[-1]
+                all_context = all_context.replace("Reasoning:", "")
+                all_context = (all_context*self.repeat_time)
+                all_context += "Reasoning:\n"
+                split_parts[-1] = all_context
+                # print(split_parts[-1])
+                # split_parts[-1] = new_question_parts
+                full_prompt = "------".join(split_parts)
+                # print(full_prompt)
+                # exit()
         messages = [
             {"role":"system", "content":role_content},
             {"role":"user", "content": full_prompt}
@@ -766,6 +792,10 @@ def parse_args():
     parser.add_argument("--embedding_model", type=str, help="所使用的embedding模型名字", default="../llm/bge-large-en-v1.5")
     # 20251216 新增cone 的rerank功能
     parser.add_argument("--rerank", default=False, help="是否对检索的候选进行cone重排序",action='store_true')
+    # 20260313 新增对prompt进行重复的测试
+    parser.add_argument("--repeat_time", type=int, default=1, help="是否直接对prompt进行简单的复制")
+    # 20260316 新增一个把context放在后面的测试
+    parser.add_argument("--repeat_reverse", default=False, action='store_true', help="是否将context放在question之后，将会影响代码运行过程中所选择加载的user_prompt文件")
     args = parser.parse_args()
     return args
 
