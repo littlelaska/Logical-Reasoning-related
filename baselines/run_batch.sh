@@ -4,7 +4,7 @@
 # 固定配置（按需改）
 # ==============================
 MODE="RAG"                     # CoT / Direct / RAG / Logical
-MODEL_NAME="qwen14"            # 给定模型
+MODEL_NAME="qwen2-3"            # 给定模型
 RAG_TOPK=30
 BATCH_SIZE=32
 MAX_NEW_TOKENS=8192
@@ -21,7 +21,7 @@ SOURCE_DOMAINS=("commonsense")    # "gsm8k" "ProntoQA" "AR-LSAT" "ProofWriter" "
  
 # 目标域（评测数据集）
 TARGET_DOMAINS=("ProntoQA" "AR-LSAT" "ProofWriter" "FOLIO" "LogicalDeduction" "gsm8k")
-TARGET_DOMAINS=("ProntoQA" "AR-LSAT" "ProofWriter" "FOLIO" "LogicalDeduction" "gsm8k")
+TARGET_DOMAINS=("LogicalDeduction")
 
 # shots: 1, 2, 3, 4
 SHOTS=(0 1 2 4 8)
@@ -141,8 +141,8 @@ for SRC in "${SOURCE_DOMAINS[@]}"; do
         
         # laska 2026.3.16按照论文中进行测试，将context放在question和option之后
         if [ "$REPEAT_REVERSE" = true ] && [ "$REPEAT_TIMES" = 1 ]; then
-          RUN_CMD="$RUN_CMD --repeat_reverse --save_path='./results_reverse'"
-          EVA_CMD="$EVA_CMD --result_path='./results_reverse'" 
+          RUN_CMD="$RUN_CMD --repeat_reverse --save_path=./results_reverse"
+          EVA_CMD="$EVA_CMD --result_path=./results_reverse" 
         fi
 
         {
@@ -153,7 +153,7 @@ for SRC in "${SOURCE_DOMAINS[@]}"; do
           echo "-------------------------------------------"
           # ${LANGCHAIN_CMD}
           echo "-------------------------------------------"
-          CUDA_VISIBLE_DEVICES=2 ${RUN_CMD}
+          CUDA_VISIBLE_DEVICES=6,7 ${RUN_CMD}
           
           echo "================ EVAL START ================"
           echo "[CMD] ${EVA_CMD}"

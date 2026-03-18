@@ -62,6 +62,8 @@ class LLM_Reasoning_Graph_Baseline:
         if self.model_name == "qwen7":
             # self.model_path = "../llms/Qwen2.5-7B-Instruct"
             self.model_path = "/data_a100/models/Qwen2.5-7B-Instruct"
+        elif self.model_name == "qwen2-3":
+            self.model_path = "/data_a100/models/Qwen2.5-3B-Instruct"
         elif self.model_name == "qwen14":
             self.model_path = "../llms/Qwen2.5-14B-Instruct"
         elif self.model_name == "qwen3-8":
